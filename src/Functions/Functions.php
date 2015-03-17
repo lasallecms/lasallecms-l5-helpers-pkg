@@ -1,4 +1,4 @@
-<?php
+<?php namespace Lasallecms\Helpers\Functions;
 
 /**
  *
@@ -26,19 +26,14 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html
  * @author     The South LaSalle Trading Corporation
  * @email      info@southlasalle.com
- *
+ *s
  */
 
+class Functions {
 
-if ( ! function_exists('helloworld'))
-{
-    /**
-     * Hello World function for basic testing
-     *
-     * @return string
-     */
-    function helloworld()
-    {
-        return "<h1>Hello from LaSalleHelper!</h1>";
-    }
+	public function HelloWorld() {
+		return "<h1>Hello from LaSalleHelper!</h1>";
+	}
+
 }
+
