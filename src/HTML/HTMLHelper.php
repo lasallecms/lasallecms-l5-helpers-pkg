@@ -29,6 +29,8 @@
  *s
  */
 
+use URL;
+
 /*
  * HTML helpers
  */
@@ -40,20 +42,54 @@ class HTMLHelper {
      * @param  mixed  $boolean-ish  Either "yes/no", 0/1, "true/false", true/false
      * @return string
      */
-    public static function convertToCheckOrXBootstrapButtons($booleanIsh) {
+    public static function convertToCheckOrXBootstrapButtons($booleanIsh)
+    {
         if (
-            ( strtolower($booleanIsh == "yes") )
+            (strtolower($booleanIsh == "yes"))
             || ($booleanIsh == 1)
             || (strtolower($booleanIsh == "true"))
             || ($booleanIsh == true)
-        )
-        {
+        ) {
             $html = '<i style="color: green;" class="fa fa-check fa-lg"></i>';
         } else {
             $html = '<i style="color: red;" class="fa fa-remove fa-lg"></i>';
         }
         return $html;
     }
+
+
+    /*
+     * Insert a bootstrap button to go back to the previous page.
+     * Usage in your view: {!! back_button('Cancel') !!}
+     *
+     * @param  string  $body  Text that will display in the button
+     * @return string
+     */
+    public static function back_button($body = 'Go Back')
+    {
+        $html ='<a class="btn btn-default btn-xs" href="';
+        $html .= URL::previous();
+        $html .= '" ';
+        $html .= 'role="button">';
+        $html .= '<span class="glyphicon glyphicon-remove"></span>';
+        $html .= $body;
+        $html .= '</a>';
+        return $html;
+    }
+
+
+    /*
+     * Insert a link to go back to the previous page.
+     * Usage in your view: {!! link_back('Cancel') !!}
+     *
+     * @param  string  $body  Text that will display in the link
+     * @return string
+     */
+    public static function back_link($body = 'Go Back')
+    {
+        return link_to(URL::previous(), $body);
+    }
+
 
  }
 
