@@ -1,8 +1,6 @@
-<?php
+<?php namespace Lasallecms\Helpers\Tests;
 
 // Based on https://github.com/laracasts/TestDummy/blob/master/src/DbTestCase.php
-
-namespace Lasallecms\Helpers\Tests;
 
 use TestCase, Artisan, DB;
 
@@ -18,13 +16,10 @@ class DbTestCase extends TestCase
      */
     public function setUp()
     {
-
-echo "\n\rsetUp()...";
         parent::setUp();
 
         // This should only do work for Sqlite DBs in memory.
-echo "\n\rphp artisan migrate:refresh...";
-        //Artisan::call('migrate:refresh');
+        Artisan::call('migrate:refresh');
 
         // We'll run all tests through a transaction,
         // and then rollback afterward.
