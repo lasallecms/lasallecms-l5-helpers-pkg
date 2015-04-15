@@ -48,6 +48,27 @@ class DatesHelper {
             ->toFormattedDateString();
     }
 
+    /*
+     * Convert date to string in Y-m-d format
+     *
+     * @param  datetime $date
+     * @return string
+     */
+    public static function convertDateONLYtoFormattedDateString($date) {
+        return Carbon::createFromFormat('Y-m-d', $date, Config::get('app.timezone'))
+            ->toFormattedDateString();
+    }
+
+
+    /*
+     * Set today to yyyy-mm-dd format
+     * I could not figure out how to return Y-m-d format with Carbon, so just using substr()
+     *
+     * @return string
+     */
+    public static function todaysDateNoTime() {
+        return substr(Carbon::today(),0,10);
+    }
 
 }
 
