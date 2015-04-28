@@ -55,12 +55,23 @@ class HelpersServiceProvider extends ServiceProvider {
      */
     public function boot()
     {
-        //$this->setupConfiguration();
-
-
+        //$this->setupViews();
     }
 
+    /**
+     * Define the views for the application.
+     *
+     * @return void
+     */
+    public function setupViews()
+    {
+        $this->loadViewsFrom(__DIR__.'/../views', 'helpers');
 
+        $this->publishes([
+            __DIR__.'/../views' => base_path('resources/views/vendor/helpers'),
+        ]);
+
+    }
 
 
 
