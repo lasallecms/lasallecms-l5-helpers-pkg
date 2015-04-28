@@ -382,6 +382,52 @@ class HTMLHelper {
 
 
 
+    /*
+     * Page title for admin pages
+     *
+     * @param  string           $package_title       package's title
+     * @param  string           $table_type_plural   table's type, in the plural
+     * @param  string           $extra_title         extra text to append to the table's title
+     * @return string
+     */
+    public static function adminPageTitle($package_title, $table_type_plural, $extra_title='')
+    {
+        $html  = '';
+        $html .= '<br /><br />';
+        $html .= '<div class="row">';
+        $html .= '    <div class="oaerror info">';
+        $html .= '        <strong>'.$package_title.'</strong> - '.$table_type_plural;
+        $html .= ' '.$extra_title;
+        $html .= '    </div';
+        $html .= '<br /><br />';
+        $html .= '</div>';
+        $html .= '<br /><br />';
+
+        return $html;
+    }
+
+
+    /*
+     * Create button for admin pages
+     *
+     * @param  string           $resource_route_name        resource route's name
+     * @param  string           $table_type_singular        table's type, in the singular
+     * @param  string           $pull                       bootstrap "pull" left or right
+     * @return string
+     */
+    public static function adminCreateButton($resource_route_name, $table_type_singular, $pull="right")
+    {
+        $full_url = route('admin.'.$resource_route_name.'.create');
+
+        $html  = '';
+        $html .= '<a class="btn btn-default pull-'.$pull.'"';
+        $html .= ' href="';
+        $html .= $full_url;
+        $html .= '" role="button">';
+        $html .= '<span class="glyphicon glyphicon-heart-empty"></span>  Create '.$table_type_singular;
+        $html .= '</a><br /><br /><br />';
+        return $html;
+    }
 
 }
 
