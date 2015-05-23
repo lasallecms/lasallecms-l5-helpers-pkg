@@ -1,4 +1,5 @@
-<?php namespace Lasallecms\Helpers\HTML;
+<?php
+namespace Lasallecms\Helpers\HTML;
 
 /**
  *
@@ -29,14 +30,15 @@
  *s
  */
 
-use URL;
+// Laravel facades
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 
 /*
  * HTML helpers
  */
-class HTMLHelper {
-
-
+class HTMLHelper
+{
     ///////////////////////////////////////////////////////////////////
     ///////////////////    GENERAL HTML HELPERS    ////////////////////
     ///////////////////////////////////////////////////////////////////
@@ -62,7 +64,6 @@ class HTMLHelper {
         return $html;
     }
 
-
     /*
      * Insert a bootstrap button to go back to the previous page.
      * Usage in your view: {!! back_button('Cancel') !!}
@@ -82,7 +83,6 @@ class HTMLHelper {
         return $html;
     }
 
-
     /*
      * Insert a link to go back to the previous page.
      * Usage in your view: {!! link_back('Cancel') !!}
@@ -94,7 +94,6 @@ class HTMLHelper {
     {
         return link_to(URL::previous(), $body);
     }
-
 
     /*
      * Format a db result set where an element is displayed on a separate line.
@@ -124,158 +123,25 @@ class HTMLHelper {
         return $html;
     }
 
-
-    ///////////////////////////////////////////////////////////////////
-    /////////////////      POST ADMIN HELPERS      ////////////////////
-    ///////////////////////////////////////////////////////////////////
-
     /*
-     * Create a dropdown with multiple selects for the categories
+     * Grab the title by ID
      *
-     * @param  collection  $categories  Laravel collection object of categories
-     * @return string
-     */
-    public static function postCategoryMultipleSelectCreate($categories)
-    {
-        // STEP 1: Initiatize the html select tag
-        $html = "";
-        $html .= '<select name="categories[]" id="categories" size="6" class="form-control" multiple>';
-
-        // STEP 2: Construct the <option></option> tags for ALL categories in the categories table
-        foreach ($categories as $category) {
-            $html .= '<option ';
-            $html .= 'value="';
-            $html .= $category->id;
-            $html .= '">';
-            $html .= $category->title;
-            $html .= '</option>"';
-        }
-        $html .= '</select>';
-
-        return $html;
-    }
-
-    /*
-     * Create a multiple select drop down for categories
-     * that have the existing categories for that post already selected
      *
-     * @param  collection      $categories              All categories
-     * @param  int             $id                      Post ID
-     * @param  collection      $postAllCategoriesById   All catgories associated with this post
-     * @return string
+     * @param    string     $table
+     * @param    int        $id
+     * @return   string
      */
-    public static function postCategoryMultipleSelectEdit($categories, $id, $postAllCategoriesById)
+    public static function getTitleById($table, $id)
     {
-        // STEP 1: Create an array of tag IDs that are currently attached to the post
-        $categories_attached_to_this_post = array();
-
-        foreach ($postAllCategoriesById as $category)
-        {
-            $categories_attached_to_this_post[] = $category->id;
-        }
-
-        // STEP 2: Initiatize the html select category
-        $html = "";
-        $html .=  '<select name="categories[]" id="tags" size="6" class="form-control" multiple>';
-
-        // STEP 3: Construct the <option></option> tags for ALL tags in the tags table
-        foreach ($categories as $category)
-        {
-            // If this tag is attached to the post, then SELECTED it
-            if ( in_array($category->id, $categories_attached_to_this_post) )
-            {
-                $selected = ' selected="selected" ';
-            } else {
-                $selected = "";
-            }
-            $html .= '<option ';
-            $html .= $selected;
-            $html .= 'value="';
-            $html .= $category->id;
-            $html .= '">';
-            $html .= $category->title;
-            $html .= '</option>"';
-        }
-        $html .= '</select>';
-        return $html;
+        return DB::table($table)->where('id', '=', $id)->pluck('title');
     }
 
 
-
-    /*
-     * Create a dropdown with multiple selects for the tags
-     *
-     * @param  collection  $tags  Laravel collection object of tags
-     * @return string
-     */
-    public static function postTagMultipleSelectCreate($tags)
-    {
-        // STEP 1: Initiatize the html select tag
-        $html = "";
-        $html .= '<select name="tags[]" id="tags" size="6" class="form-control" multiple>';
-
-        // STEP 2: Construct the <option></option> tags for ALL tags in the tags table
-        foreach ($tags as $tag) {
-            $html .= '<option ';
-            $html .= 'value="';
-            $html .= $tag->id;
-            $html .= '">';
-            $html .= $tag->title;
-            $html .= '</option>"';
-        }
-        $html .= '</select>';
-
-        return $html;
-    }
-
-    /*
-     * Create a multiple select drop down for tags
-     * that have the existing tags for that post already selected
-     *
-     * @param  collection      $tags              All tags
-     * @param  int             $id                Post ID
-     * @param  collection      $postAllTagsById   All tags associated with this post
-     * @return string
-     */
-    public static function postTagMultipleSelectEdit($tags, $id, $postAllTagsById)
-    {
-        // STEP 1: Create an array of tag IDs that are currently attached to the post
-        $tags_attached_to_this_post = array();
-
-        foreach ($postAllTagsById as $tag)
-        {
-            $tags_attached_to_this_post[] = $tag->id;
-        }
-
-        // STEP 2: Initiatize the html select tag
-        $html = "";        //foreach ( Post::find($id)->tags as $ttgg)
-        $html .=  '<select name="tags[]" id="tags" size="6" class="form-control" multiple>';
-
-        // STEP 3: Construct the <option></option> tags for ALL tags in the tags table
-        foreach ($tags as $tag)
-        {
-            // If this tag is attached to the post, then SELECTED it
-            if ( in_array($tag->id, $tags_attached_to_this_post) )
-            {
-                $selected = ' selected="selected" ';
-            } else {
-                $selected = "";
-            }
-            $html .= '<option ';
-            $html .= $selected;
-            $html .= 'value="';
-            $html .= $tag->id;
-            $html .= '">';
-            $html .= $tag->title;
-            $html .= '</option>"';
-        }
-        $html .= '</select>';
-        return $html;
-    }
 
 
     ///////////////////////////////////////////////////////////////////
-    /////////////////    CATEGORY ADMIN HELPERS     ///////////////////
+    ///////////         CATEGORY ADMIN HELPERS             ////////////
+    ///////////    AS CATEGORY HAS ITSELF AS PARENT_ID     ////////////
     ///////////////////////////////////////////////////////////////////
 
     /*
@@ -291,7 +157,6 @@ class HTMLHelper {
 
         return $categoryRepository->getFind($parent_id)->title;
     }
-
 
     /*
      * Create a dropdown with a single select for the parent category
@@ -325,7 +190,6 @@ class HTMLHelper {
 
         return $html;
     }
-
 
     /*
      * Create a multiple select drop down for tags
@@ -382,6 +246,10 @@ class HTMLHelper {
 
 
 
+    ///////////////////////////////////////////////////////////////////
+    /////////////////     ADMIN TITLE HELPERS       ///////////////////
+    ///////////////////////////////////////////////////////////////////
+
     /*
      * Page title for admin pages
      *
@@ -406,6 +274,55 @@ class HTMLHelper {
         return $html;
     }
 
+    public static function adminPageSubTitle($record = null, $modelClass)
+    {
+        $html = '';
+        $html .= '<div class="row">';
+        $html .= '<div class="col-md-3"></div>';
+        $html .= '<div class="col-md-6">';
+        $html .= '<h1>';
+        $html .= '<span class="label label-info">';
+
+        if ($record)
+        {
+            $html .= 'Edit the ';
+            $html .= $modelClass;
+            $html .= ': "';
+            $html .= $record->title;
+            $html .= '"';
+        } else {
+            $html .= 'Create a ';
+            $html .= $modelClass;
+        }
+        $html .= '</span>';
+        $html .= '</h1>';
+        $html .= '</div>';
+        $html .= '<div class="col-md-3"></div>';
+        $html .= '</div>';
+
+        return $html;
+    }
+
+
+
+    ///////////////////////////////////////////////////////////////////
+    /////////////     ADMIN FORM FIELD HELPERS       //////////////////
+    ///////////////////////////////////////////////////////////////////
+
+    /*
+     * Transform the field name into a format suitable for a form label
+     *
+     * @param  string  $name   Form field name
+     * @return string
+     */
+    public static function adminFormFieldLabel($name)
+    {
+        if ($name == "id") return "ID";
+
+        $html = str_replace("_", " ", $name);
+        $html = ucwords($html);
+        return $html;
+    }
 
     /*
      * Create button for admin pages
@@ -429,5 +346,28 @@ class HTMLHelper {
         return $html;
     }
 
+    /*
+     * Create button for admin pages
+     *
+     * @param  string           $resource_route_name        resource route's name
+     * @param  string           $message                    optional button text
+     * @param  string           $pull                       bootstrap "pull" left or right
+     * @return string
+     */
+    public static function adminIndexButton($resource_route_name, $message=null, $pull="right")
+    {
+        $full_url = route('admin.'.$resource_route_name.'.index');
+
+        if (!$message) $message = $resource_route_name;
+
+        $html  = '';
+        $html .= '<a class="btn btn-default pull-'.$pull.'"';
+        $html .= ' href="';
+        $html .= $full_url;
+        $html .= '" role="button">';
+        $html .= '<span class="glyphicon glyphicon-heart-empty"></span>  '.$message;
+        $html .= '</a><br /><br /><br />';
+        return $html;
+    }
 }
 
