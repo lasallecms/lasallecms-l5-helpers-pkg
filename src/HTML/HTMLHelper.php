@@ -133,7 +133,40 @@ class HTMLHelper
      */
     public static function getTitleById($table, $id)
     {
+
+        //return "table = ".$table." and id = ".$id;
+
+        // Special handling for users
+        if ($table == "users")
+        {
+            return self::getUserForIndexListing($id);
+        }
+
         return DB::table($table)->where('id', '=', $id)->pluck('title');
+    }
+
+    /*
+     * Grab the User info from the "Users" table.
+     * Created specifically for the CRM "People" index listing
+     *
+     * @param    int        $id
+     * @return   string
+     */
+    public static function getUserForIndexListing($id)
+    {
+        $user = DB::table('users')->where('id', $id)->first();
+
+        // A customer in LaSalleCRM does *NOT* have to be a LaSalle Software user
+        if (empty($user->id))
+        {
+            return;
+        }
+
+        $html  = '<a href="';
+        $html .= URL::route('admin.users.edit', $id);
+        $html .= '">'.$user->name.'</a>';
+
+        return $html;
     }
 
 
@@ -291,7 +324,7 @@ class HTMLHelper
             $html .= $record->title;
             $html .= '"';
         } else {
-            $html .= 'Create a ';
+            $html .= 'Create ';
             $html .= $modelClass;
         }
         $html .= '</span>';
@@ -312,11 +345,18 @@ class HTMLHelper
     /*
      * Transform the field name into a format suitable for a form label
      *
-     * @param  string  $name   Form field name
+     * @param  array  $field   Form field array from the model
      * @return string
      */
-    public static function adminFormFieldLabel($name)
+    public static function adminFormFieldLabel($field)
     {
+        if (!empty($field['alternate_form_name']))
+        {
+            $name = $field['alternate_form_name'];
+        } else {
+            $name = $field['name'];
+        }
+
         if ($name == "id") return "ID";
 
         $html = str_replace("_", " ", $name);
