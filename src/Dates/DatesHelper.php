@@ -1,4 +1,5 @@
-<?php namespace Lasallecms\Helpers\Dates;
+<?php
+namespace Lasallecms\Helpers\Dates;
 
 /**
  *
@@ -29,21 +30,27 @@
  *s
  */
 
+
+// Laravel facades
+use Illuminate\Support\Facades\Config;
+
+// Third party classes
 use Carbon\Carbon;
-use Config;
+
 
 /*
- * Do things with date/time
+ * Date/time helper
  */
-class DatesHelper {
-
+class DatesHelper
+{
     /*
      * Convert date to string in Y-m-d H:i:s format
      *
      * @param  datetime $date
      * @return string
      */
-    public static function convertDatetoFormattedDateString($date) {
+    public static function convertDatetoFormattedDateString($date)
+    {
         return Carbon::createFromFormat('Y-m-d H:i:s', $date, Config::get('app.timezone'))
             ->toFormattedDateString();
     }
@@ -54,7 +61,10 @@ class DatesHelper {
      * @param  datetime $date
      * @return string
      */
-    public static function convertDateONLYtoFormattedDateString($date) {
+    public static function convertDateONLYtoFormattedDateString($date)
+    {
+        if (!$date) return "n/a";
+
         return Carbon::createFromFormat('Y-m-d', $date, Config::get('app.timezone'))
             ->toFormattedDateString();
     }
@@ -66,7 +76,8 @@ class DatesHelper {
      *
      * @return string
      */
-    public static function todaysDateNoTime() {
+    public static function todaysDateNoTime()
+    {
         return substr(Carbon::today(),0,10);
     }
 

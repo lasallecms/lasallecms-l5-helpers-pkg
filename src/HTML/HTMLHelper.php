@@ -142,12 +142,44 @@ class HTMLHelper
             return self::getUserForIndexListing($id);
         }
 
-        return DB::table($table)->where('id', '=', $id)->pluck('title');
+        // Special handling for posts (for post updates listing)
+        if ($table == "posts")
+        {
+            return self::getPostForIndexListing($id);
+        }
+
+        $title = DB::table($table)->where('id', '=', $id)->pluck('title');
+
+        if ($title == "") return '<span class="text-danger">n/a</span>';
+
+
+        // ASSIGN COLOURS TO STATUS
+        if ($table == "lookup_todo_priority_types")
+        {
+            if (strtolower($title) == "green")
+            {
+                //return '<button type="button" class="btn btn-success btn-sm">'.$title.'</button>';
+            }
+
+            if (strtolower($title) == "yellow")
+            {
+                return '<button type="button" class="btn btn-warning btn-sm">'.$title.'</button>';
+            }
+
+            if (strtolower($title) == "red")
+            {
+                return '<button type="button" class="btn btn-danger btn-sm">'.$title.'</button>';
+            }
+        }
+
+
+        return $title;
     }
 
     /*
      * Grab the User info from the "Users" table.
-     * Created specifically for the CRM "People" index listing
+     * Created specifically for the CRM "People" index listing, but
+     * displays in the post update create/edit form.
      *
      * @param    int        $id
      * @return   string
@@ -159,12 +191,39 @@ class HTMLHelper
         // A customer in LaSalleCRM does *NOT* have to be a LaSalle Software user
         if (empty($user->id))
         {
-            return;
+            return "n/a";
         }
 
         $html  = '<a href="';
         $html .= URL::route('admin.users.edit', $id);
         $html .= '">'.$user->name.'</a>';
+
+        return $html;
+    }
+
+    /*
+     * Grab the Post info from the "posts" table.
+     * Created specifically for the "Post Updates" index listing
+     *
+     * @param    int        $id
+     * @return   string
+     */
+    public static function getPostForIndexListing($id)
+    {
+        // Actually, it's dangerous and confusing to have the link to the post's EDIT
+        // form display in the post update's create/edit form. So, I am omitting
+        // the link; and, instead, am displaying the post's title with the post's
+        // ID in brackets.
+
+        /*
+        $post = DB::table('posts')->where('id', $id)->first();
+        $html  = '<a href="';
+        $html .= URL::route('admin.posts.edit', $id);
+        $html .= '" target="_blank">'.$post->title.'</a>';
+        */
+
+        $title = DB::table('posts')->where('id', '=', $id)->pluck('title');
+        $html = $title." (".$id.")";
 
         return $html;
     }
@@ -186,7 +245,7 @@ class HTMLHelper
      */
     public static function displayParentCategoryTitle($parent_id, $categoryRepository)
     {
-        if ($parent_id == 0) return "";
+        if ($parent_id == 0) return "n/a";
 
         return $categoryRepository->getFind($parent_id)->title;
     }
@@ -293,11 +352,13 @@ class HTMLHelper
      */
     public static function adminPageTitle($package_title, $table_type_plural, $extra_title='')
     {
+        $table_type_plural = self::properPlural($table_type_plural);
+
         $html  = '';
         $html .= '<br /><br />';
         $html .= '<div class="row">';
         $html .= '    <div class="oaerror info">';
-        $html .= '        <strong>'.$package_title.'</strong> - '.$table_type_plural;
+        $html .= '        <strong>'.$package_title.'</strong> - '.ucwords($table_type_plural);
         $html .= ' '.$extra_title;
         $html .= '    </div';
         $html .= '<br /><br />';
@@ -309,6 +370,9 @@ class HTMLHelper
 
     public static function adminPageSubTitle($record = null, $modelClass)
     {
+
+        $modelClass = self::properPlural($modelClass);
+
         $html = '';
         $html .= '<div class="row">';
         $html .= '<div class="col-md-3"></div>';
@@ -316,17 +380,19 @@ class HTMLHelper
         $html .= '<h1>';
         $html .= '<span class="label label-info">';
 
+        // Edit or Create?
         if ($record)
         {
             $html .= 'Edit the ';
-            $html .= $modelClass;
+            $html .= ucwords($modelClass);
             $html .= ': "';
             $html .= $record->title;
             $html .= '"';
         } else {
             $html .= 'Create ';
-            $html .= $modelClass;
+            $html .= ucwords($modelClass);
         }
+
         $html .= '</span>';
         $html .= '</h1>';
         $html .= '</div>';
@@ -350,6 +416,7 @@ class HTMLHelper
      */
     public static function adminFormFieldLabel($field)
     {
+        // Does the field have an alternate name?
         if (!empty($field['alternate_form_name']))
         {
             $name = $field['alternate_form_name'];
@@ -368,20 +435,22 @@ class HTMLHelper
      * Create button for admin pages
      *
      * @param  string           $resource_route_name        resource route's name
-     * @param  string           $table_type_singular        table's type, in the singular
+     * @param  string           $button_label               button's label
      * @param  string           $pull                       bootstrap "pull" left or right
      * @return string
      */
-    public static function adminCreateButton($resource_route_name, $table_type_singular, $pull="right")
+    public static function adminCreateButton($resource_route_name, $button_label, $pull="right")
     {
         $full_url = route('admin.'.$resource_route_name.'.create');
+
+        $button_label = self::pluralToSingular($button_label);
 
         $html  = '';
         $html .= '<a class="btn btn-default pull-'.$pull.'"';
         $html .= ' href="';
         $html .= $full_url;
         $html .= '" role="button">';
-        $html .= '<span class="glyphicon glyphicon-heart-empty"></span>  Create '.$table_type_singular;
+        $html .= '<span class="glyphicon glyphicon-heart-empty"></span>  Create '.ucwords($button_label);
         $html .= '</a><br /><br /><br />';
         return $html;
     }
@@ -408,6 +477,93 @@ class HTMLHelper
         $html .= '<span class="glyphicon glyphicon-heart-empty"></span>  '.$message;
         $html .= '</a><br /><br /><br />';
         return $html;
+    }
+
+
+    /*
+     * Return grammatically correct singularizations.
+     *
+     * @param  string           $pluralWordToCheck                   Plural word to check
+     * @return string
+     */
+    public static function pluralToSingular($pluralWordToCheck)
+    {
+        $listOfSingular = [
+            'categories' => 'category',
+            'people'     => 'person',
+            'peoples'    => 'person',
+            'social'     => 'social site',
+            'todo_item'  => 'to do item',
+        ];
+
+        foreach ($listOfSingular as $plural => $singular)
+        {
+            if (strtolower($pluralWordToCheck) == strtolower($plural))
+            {
+                return $singular;
+            }
+        }
+
+        return $pluralWordToCheck;
+    }
+
+    /*
+     * Return grammatically correct singularizations.
+     *
+     * @param  string           $pluralWordToCheck                   Plural word to check
+     * @return string
+     */
+    public static function singularToPlural($singularWordToCheck)
+    {
+        $listOfPlurals = [
+            'category' => 'categories',
+            'person'   => 'peoples',
+        ];
+
+        foreach ($listOfPlurals as $singular => $plural)
+        {
+            if (strtolower($singularWordToCheck) == strtolower($plural))
+            {
+                return $plural;
+            }
+        }
+
+        return $singularWordToCheck;
+    }
+
+
+    /*
+     * Is the plural word grammatically correct?
+     *
+     * Also, a method to specify custom admin form subtitle names (regular create/edit forms),
+     * and called from Formhandler's AdminBaseFormController.
+     *
+     * @param  string           $pluralWordToCheck                   Plural word to check
+     * @return string
+     */
+    public static function properPlural($pluralWordToCheck)
+    {
+        $listOfPlurals = [
+            'categorys'   => 'categories',
+            'people'      => 'person',
+            'peoples'     => 'people',
+            'postupdate'  =>'post update',
+            'postupdates' =>'post updates',
+            'social'      => 'social site',
+            'socials'     => 'social sites',
+            'todo_items'  => 'To Do items',
+            'Todo_item'   => 'To Do Item',
+        ];
+
+        foreach ($listOfPlurals as $improperPlural => $correctPlural)
+        {
+            if (strtolower($improperPlural) == strtolower($pluralWordToCheck))
+            {
+                return $correctPlural;
+            }
+        }
+
+        return $pluralWordToCheck;
     }
 }
 
