@@ -40,7 +40,7 @@ use Illuminate\Support\Facades\URL;
 class HTMLHelper
 {
     ///////////////////////////////////////////////////////////////////
-    ///////////////////    GENERAL HTML HELPERS    ////////////////////
+    ///////////////////    MAINLY FOR INDEX LISTING    ////////////////
     ///////////////////////////////////////////////////////////////////
 
     /*
@@ -153,7 +153,7 @@ class HTMLHelper
         if ($title == "") return '<span class="text-danger">n/a</span>';
 
 
-        // ASSIGN COLOURS TO STATUS
+        // ASSIGN COLOURS TO lookup_todo_priority_types
         if ($table == "lookup_todo_priority_types")
         {
             if (strtolower($title) == "green")
@@ -170,8 +170,8 @@ class HTMLHelper
             {
                 return '<button type="button" class="btn btn-danger btn-sm">'.$title.'</button>';
             }
-        }
 
+        }
 
         return $title;
     }
@@ -226,6 +226,25 @@ class HTMLHelper
         $html = $title." (".$id.")";
 
         return $html;
+    }
+
+
+    /*
+     * Need a helper method to finagle the varchar field in the index listing.
+     *
+     * @param   array   $field
+     * @param   string  $data
+     * @return  string
+     */
+    public static function finagleVarcharFieldTypeForIndexListing($field, $data)
+    {
+        if (strtolower($field['persist_wash']) == "url")
+        {
+            $prefacedURL = self::prefaceURLwithHTTP($data);
+            return '<a href="'.$prefacedURL.'" target="_blank">'.$data.'</a>';
+        }
+
+        return $data;
     }
 
 
@@ -490,6 +509,8 @@ class HTMLHelper
     {
         $listOfSingular = [
             'categories' => 'category',
+            'list_email' => 'email list',
+            'listlist'   => 'list',
             'people'     => 'person',
             'peoples'    => 'person',
             'social'     => 'social site',
@@ -545,6 +566,8 @@ class HTMLHelper
     {
         $listOfPlurals = [
             'categorys'   => 'categories',
+            'list_email'  => 'email list',
+            'listlist'    => 'list',
             'people'      => 'person',
             'peoples'     => 'people',
             'postupdate'  =>'post update',
@@ -564,6 +587,27 @@ class HTMLHelper
         }
 
         return $pluralWordToCheck;
+    }
+
+
+    ///////////////////////////////////////////////////////////////////
+    ///////////////////          MISC                  ////////////////
+    ///////////////////////////////////////////////////////////////////
+
+    /*
+     * Preface URL's with "http://"
+     *
+     * @param   string  $url
+     * @return  string
+     */
+    public static function prefaceURLwithHTTP($url)
+    {
+        $url = trim($url);
+        if (substr($url, 0, 7 ) == "http://") return $url;
+
+        if (substr($url, 0, 8 ) == "http://") return $url;
+
+        return "http://".$url;
     }
 }
 
