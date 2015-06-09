@@ -387,7 +387,15 @@ class HTMLHelper
         return $html;
     }
 
-    public static function adminPageSubTitle($record = null, $modelClass)
+    /*
+     * Display button with a label describing what the form is doing.
+     *
+     * @param  object           $record       Optional record from the database
+     * @param  string           $modelClass   The model's classname
+     * @param  bool             $show         True when from controller SHOW
+     * @return string
+     */
+    public static function adminPageSubTitle($record = null, $modelClass, $show=false)
     {
 
         $modelClass = self::properPlural($modelClass);
@@ -402,7 +410,13 @@ class HTMLHelper
         // Edit or Create?
         if ($record)
         {
-            $html .= 'Edit the ';
+            if ($show)
+            {
+                $html .= 'Show the ';
+            } else {
+                $html .= 'Edit the ';
+            }
+
             $html .= ucwords($modelClass);
             $html .= ': "';
             $html .= $record->title;
@@ -480,20 +494,23 @@ class HTMLHelper
      * @param  string           $resource_route_name        resource route's name
      * @param  string           $message                    optional button text
      * @param  string           $pull                       bootstrap "pull" left or right
+     * @param  string           $icon                       specify icon, optional
      * @return string
      */
-    public static function adminIndexButton($resource_route_name, $message=null, $pull="right")
+    public static function adminIndexButton($resource_route_name, $message=null, $pull="right", $icon="")
     {
         $full_url = route('admin.'.$resource_route_name.'.index');
 
         if (!$message) $message = $resource_route_name;
+
+        if ($icon == "") $icon = 'glyphicon glyphicon-heart-empty';
 
         $html  = '';
         $html .= '<a class="btn btn-default pull-'.$pull.'"';
         $html .= ' href="';
         $html .= $full_url;
         $html .= '" role="button">';
-        $html .= '<span class="glyphicon glyphicon-heart-empty"></span>  '.$message;
+        $html .= '<span class=".$icon."></span>  '.$message;
         $html .= '</a><br /><br /><br />';
         return $html;
     }
