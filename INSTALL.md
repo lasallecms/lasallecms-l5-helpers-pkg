@@ -19,7 +19,7 @@ My Flagship CMS app so depends on this package that it has the composer and serv
 
 In config/app.php:
 ```
-'Lasallecms\Helpers\HelpersServiceProvider',
+Lasallecms\Helpers\HelpersServiceProvider::class,
 ```
 
 
