@@ -1,4 +1,5 @@
-<?php namespace Lasallecms\Helpers\Middleware;
+<?php 
+namespace Lasallecms\Helpers\Middleware;
 
 /**
  *
@@ -28,23 +29,27 @@
  *
  */
 
-use Illuminate\Contracts\Routing\Middleware;
-use Illuminate\Http\Request;
-use Closure;
-
+// LaSalle Software
 use Lasallecms\Usermanagement\Http\Middleware\Admin\CustomAdminAuthChecks as CustomChecksFromUserMgmtPkg;
 
-use Auth;
+// Laravel facades
+use Illuminate\Support\Facades\Auth;
+
+// Laravel classes
+use Illuminate\Http\Request;
+use Closure;
 
 /*
  * Perform custom login checks.
  *
  * Note that these custom checks originate in the User Management package, not in this Admin package.
  */
-class CustomAdminAuthChecks implements Middleware{
+class CustomAdminAuthChecks
+{
 
 
-    public function __construct(CustomChecksFromUserMgmtPkg $customChecksFromUserMgmtPkg) {
+    public function __construct(CustomChecksFromUserMgmtPkg $customChecksFromUserMgmtPkg) 
+    {
         $this->customChecksFromUserMgmtPkg = $customChecksFromUserMgmtPkg;
     }
 
@@ -56,7 +61,8 @@ class CustomAdminAuthChecks implements Middleware{
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next) {
+    public function handle($request, Closure $next) 
+    {
 
         // Allowed IP Addresses
         if ($this->customChecksFromUserMgmtPkg->isAllowedIPAddressesCheck()) {
@@ -74,7 +80,8 @@ class CustomAdminAuthChecks implements Middleware{
 
         // User must be enabled
         // This test is mandatory! So, no setting in the config
-        if (!$this->UserEnabledCheck() ) {
+        if (!$this->UserEnabledCheck() )
+        {
 
             Auth::logout();
 
@@ -87,7 +94,8 @@ class CustomAdminAuthChecks implements Middleware{
 
         // User must be activated
         // This test is mandatory! So, no setting in the config
-        if (!$this->UserActivatedCheck() ) {
+        if (!$this->UserActivatedCheck() )
+        {
 
             Auth::logout();
 
@@ -99,8 +107,10 @@ class CustomAdminAuthChecks implements Middleware{
         }
 
         // Allowed users
-        if ($this->customChecksFromUserMgmtPkg->isAllowedUsersCheck()) {
-            if (!$this->customChecksFromUserMgmtPkg->allowedUsersCheck($this->customChecksFromUserMgmtPkg->getAllowedUsers(), $this->getAuthEmail() ) ) {
+        if ($this->customChecksFromUserMgmtPkg->isAllowedUsersCheck())
+        {
+            if (!$this->customChecksFromUserMgmtPkg->allowedUsersCheck($this->customChecksFromUserMgmtPkg->getAllowedUsers(), $this->getAuthEmail() ) )
+            {
 
                 Auth::logout();
 
@@ -113,9 +123,10 @@ class CustomAdminAuthChecks implements Middleware{
         }
 
         // Allowed user groups
-        if ($this->customChecksFromUserMgmtPkg->isUserGroupCheck()) {
-            if (!$this->customChecksFromUserMgmtPkg->allowedUserGroupCheck($this->customChecksFromUserMgmtPkg->getAllowedUserGroups(), $this->getAuthUserGroup()) ) {
-
+        if ($this->customChecksFromUserMgmtPkg->isUserGroupCheck())
+        {
+            if (!$this->customChecksFromUserMgmtPkg->allowedUserGroupCheck($this->customChecksFromUserMgmtPkg->getAllowedUserGroups(), $this->getAuthUserGroup()) )
+            {
                 Auth::logout();
 
                 return redirect('admin/login')
@@ -135,7 +146,8 @@ class CustomAdminAuthChecks implements Middleware{
      *
      * @return string
      */
-    public function getAuthEmail() {
+    public function getAuthEmail()
+    {
         $emailRequest = Auth::user()->email;
         return $emailRequest;
     }
@@ -145,8 +157,8 @@ class CustomAdminAuthChecks implements Middleware{
      *
      * @return string
      */
-    public function getAuthUserGroup() {
-
+    public function getAuthUserGroup()
+    {
         $user_groups = Auth::user()->find(Auth::user()->id)->group;
 
         // create an array
@@ -164,8 +176,8 @@ class CustomAdminAuthChecks implements Middleware{
      * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
-    public function UserEnabledCheck() {
-
+    public function UserEnabledCheck()
+    {
         $user = Auth::user()->where('email', '=', Auth::user()->email )->get()->first();
 
         if ( $user ) {
@@ -181,8 +193,8 @@ class CustomAdminAuthChecks implements Middleware{
      * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
-    public function UserActivatedCheck() {
-
+    public function UserActivatedCheck()
+    {
         $user = Auth::user()->where('email', '=', Auth::user()->email )->get()->first();
 
         if ( $user ) {
@@ -191,6 +203,4 @@ class CustomAdminAuthChecks implements Middleware{
             return false;
         }
     }
-
-
 }

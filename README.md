@@ -6,7 +6,7 @@
 [![Latest Unstable Version](https://poser.pugx.org/lasallecms/helpers/v/unstable.svg)](https://packagist.org/packages/lasallecms/helpers)
 [![GitHub Issues](https://img.shields.io/github/issues/lasallecms/lasallecms-l5-helpers-pkg.svg)](https://github.com/lasallecms/lasallecms-l5-helpers-pkg/issues)
 [![Software License](https://img.shields.io/badge/license-GPLv3-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Laravel](https://img.shields.io/badge/Laravel-v5-brightgreen.svg?style=flat-square)](http://laravel.com)
+[![Laravel](https://img.shields.io/badge/Laravel-v5.1-brightgreen.svg?style=flat-square)](http://laravel.com)
 
 
 Helpers package made specifically for my LaSalle Content Management System. 

@@ -1,4 +1,5 @@
-<?php namespace Lasallecms\Helpers\Middleware;
+<?php
+namespace Lasallecms\Helpers\Middleware;
 
 /**
  *
@@ -11,7 +12,7 @@
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY/var/www/html/lasallecms-l5-packages/packages/lasallecrm/lasallecrmadmin; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -29,13 +30,13 @@
  *
  */
 
+// Laravel classes
 use Closure;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\Routing\Middleware;
 
-class MustBeLoggedInCheck implements Middleware {
-
+class MustBeLoggedInCheck
+{
     /**
      * The Guard implementation.
      *
@@ -70,5 +71,4 @@ class MustBeLoggedInCheck implements Middleware {
 
         return $next($request);
     }
-
 }
