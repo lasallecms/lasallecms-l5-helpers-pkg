@@ -526,6 +526,7 @@ class HTMLHelper
     {
         $listOfSingular = [
             'categories' => 'category',
+            'kb_item'    => 'knowledge base item',
             'list_email' => 'email list',
             'listlist'   => 'list',
             'people'     => 'person',
@@ -583,6 +584,8 @@ class HTMLHelper
     {
         $listOfPlurals = [
             'categorys'   => 'categories',
+            'kb_item'     => 'item',
+            'kb_items'    => 'Items',
             'list_email'  => 'email list',
             'listlist'    => 'list',
             'people'      => 'person',
@@ -612,7 +615,7 @@ class HTMLHelper
     ///////////////////////////////////////////////////////////////////
 
     /*
-     * Preface URL's with "http://"
+     * Make sure the URL is fully qualified
      *
      * @param   string  $url
      * @return  string
@@ -622,7 +625,7 @@ class HTMLHelper
         $url = trim($url);
         if (substr($url, 0, 7 ) == "http://") return $url;
 
-        if (substr($url, 0, 8 ) == "http://") return $url;
+        if (substr($url, 0, 8 ) == "https://") return $url;
 
         return "http://".$url;
     }
