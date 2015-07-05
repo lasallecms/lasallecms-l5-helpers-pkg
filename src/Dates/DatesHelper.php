@@ -51,7 +51,7 @@ class DatesHelper
      */
     public static function convertDatetoFormattedDateString($date)
     {
-        return Carbon::createFromFormat('Y-m-d H:i:s', $date, Config::get('app.timezone'))
+        return Carbon::createFromFormat('Y-m-d H:i:s', $date, self::setTimeZone())
             ->toFormattedDateString();
     }
 
@@ -65,7 +65,7 @@ class DatesHelper
     {
         if (!$date) return "n/a";
 
-        return Carbon::createFromFormat('Y-m-d', $date, Config::get('app.timezone'))
+        return Carbon::createFromFormat('Y-m-d', $date, self::setTimeZone())
             ->toFormattedDateString();
     }
 
@@ -78,7 +78,41 @@ class DatesHelper
      */
     public static function todaysDateNoTime()
     {
+        self::setTimeZone();
         return substr(Carbon::today(),0,10);
+    }
+
+
+    /*
+     * Today's date, using the time zone in the app's config/app.php.
+     *
+     * @return string
+     */
+    public static function todaysDateSetToLocalTime()
+    {
+        self::setTimeZone();
+        return Carbon::today();
+    }
+
+    /*
+     * Set the time zone. If there is no default time zone, set it to Toronto!
+     *
+     * @return void
+     */
+    public static function setTimeZone()
+    {
+        $timeZone = Config::get('app.timezone');
+
+        if (
+            ($timeZone == '')
+             || (strtoupper($timeZone) == 'UTC')
+             || (empty($timeZone))
+        )
+            $timeZone = 'America/Toronto';
+
+        date_default_timezone_set($timeZone);
+
+        return;
     }
 
 }
