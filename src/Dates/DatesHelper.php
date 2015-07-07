@@ -27,7 +27,7 @@ namespace Lasallecms\Helpers\Dates;
  * @license    http://www.gnu.org/licenses/gpl-3.0.html
  * @author     The South LaSalle Trading Corporation
  * @email      info@southlasalle.com
- *s
+ *
  */
 
 
