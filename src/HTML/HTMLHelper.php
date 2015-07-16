@@ -30,7 +30,11 @@ namespace Lasallecms\Helpers\HTML;
  *s
  */
 
+// LaSalle Software
+use Lasallecms\Helpers\Images\ImagesHelper;
+
 // Laravel facades
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 
@@ -608,6 +612,95 @@ class HTMLHelper
 
         return $pluralWordToCheck;
     }
+
+
+
+    ///////////////////////////////////////////////////////////////////
+    ////////     POST UPDATE QUERY FOR USE IN BLADE FILES      ////////
+    ///////////////////////////////////////////////////////////////////
+    /**
+     * Find the Post Updates for a given post.
+     *
+     * For use in blade files, as this HTMLHelper class is already passed to the view
+     *
+     * @param  int         $post_id        The post's ID
+     * @return collection
+     */
+    public static function findPostupdatesByPostId($post_id)
+    {
+        return DB::table('postupdates')
+            ->where('post_id', '=', $post_id)
+            ->where('enabled', '=', 1)
+            ->get();
+    }
+
+
+    ///////////////////////////////////////////////////////////////////
+    /////                  SOCIAL MEDIA TAGS                     //////
+    ///////////////////////////////////////////////////////////////////
+
+    /**
+     * Create an array of OG tags and their values for a post.
+     *
+     * https://developers.facebook.com/docs/sharing/webmasters
+     *
+     * @param  object   $post       The post object.
+     * @return array
+     */
+    public static function createOpenGraphTagsForPost($post)
+    {
+       return [
+            'og:title'               => $post->title,
+            'og:type'                => 'article',
+            'og:url'                 => $post->canonical_url,
+            'og:image'               => $post->urlImage,
+            'og:description'         => $post->meta_description,
+            'og:site_name'           => Config::get('lasallecmsfrontend.og_site_name'),
+            'article:published_time' => $post->created_at,
+            'article:modified_time'  => $post->updated_at,
+        ];
+    }
+
+    /**
+     * Create an array of Twitter tags and their values for a post.
+     *
+     *  https://dev.twitter.com/cards/overview
+     *
+     * @param  object   $post       The post object.
+     * @return array
+     */
+    public static function createTwitterTagsForPost($post)
+    {
+        return [
+            'twitter:card'        => Config::get('lasallecmsfrontend.twitter_card'),
+            'twitter:site'        => Config::get('lasallecmsfrontend.twitter_site'),
+            'twitter:title'       => $post->title,
+            'twitter:description' => $post->meta_description,
+            'twitter:creator'     => Config::get('lasallecmsfrontend.twitter_card'),
+            'twitter:image:src'   => $post->urlImage,
+        ];
+    }
+
+    /**
+     * Create an array of Google tags and their values for a post.
+     *
+     *  https://dev.twitter.com/cards/overview
+     *
+     * @param  object   $post       The post object.
+     * @return array
+     */
+    public static function createGoogleTagsForPost($post)
+    {
+        return [
+            'name'        => $post->title,
+            'description' => $post->meta_description,
+            'image'       => $post->urlImage,
+        ];
+    }
+
+
+
+
 
 
     ///////////////////////////////////////////////////////////////////
