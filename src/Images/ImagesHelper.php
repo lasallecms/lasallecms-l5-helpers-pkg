@@ -62,13 +62,18 @@ class ImagesHelper
     }
 
 
+    ///////////////////////////////////////////////////////////////////
+    /////         MAIN METHODS FOR THE IMAGE HELPERS FOR POSTS   //////
+    ///////////////////////////////////////////////////////////////////
+
+
     /**
-     * Create resized image files
+     * Create resized image files for POSTS
      *
-     * @param   string  $filename      Image filename
+     * @param   string  $filename              Image's filename
      * @return  void
      */
-    public function createResizedImageFiles($filename)
+    public function createPostResizedImageFiles($filename)
     {
         // grab the image sizes to create from the config
         $imageSizes = Config::get('lasallecmsfrontend.image_sizes');
@@ -83,6 +88,156 @@ class ImagesHelper
             }
         }
     }
+
+
+    /**
+     * Put together the URL of the image.
+     *
+     * Need this for the social media tags for image.
+     *
+     * @param  string   $filename                 The uploaded image's filename
+     * @parem  int      $width                    Width of the resized image
+     * @param  int      $height                   Height of the resized image
+     * @return string
+     */
+    public function urlOfImage($filename, $width=300, $height=300)
+    {
+        $url  = Config::get('app.url');
+        $url .= '/';
+        $url .= Config::get('lasallecmsfrontend.images_folder_resized');
+        $url .= '/';
+        $url .= $this->parseFilenameIntoResizedFilename($filename, $width, $height);
+
+        return $url;
+    }
+
+
+    /**
+     * Take an image's filename, and return the name of the resized file.
+     *
+     * For use within the "single post" blade file.
+     *
+     * Does *NOT* create the resized image file.
+     *
+     * @param  string   $filename                 The uploaded image's filename
+     * @parem  int      $width                    Width of the resized image
+     * @param  int      $height                   Height of the resized image
+     * @return string
+     */
+    public function parseFilenameIntoResizedFilename($filename, $width=300, $height=300)
+    {
+        $fileNameWithNoExtension = $this->filenameWithNoExtension($filename);
+        $fileNameExtension       = $this->filenameWithExtensionOnly($filename);
+
+        $parsedFilename  = "";
+        $parsedFilename .= $fileNameWithNoExtension;
+        $parsedFilename .= "-";
+        $parsedFilename .= $width;
+        $parsedFilename .= "x";
+        $parsedFilename .= "$height";
+        $parsedFilename .= ".";
+        $parsedFilename .= $fileNameExtension;
+
+        return $parsedFilename;
+    }
+
+
+
+    ///////////////////////////////////////////////////////////////////
+    ///       MAIN METHODS FOR THE IMAGE HELPERS FOR CATEGORIES     ///
+    ///////////////////////////////////////////////////////////////////
+
+
+    /**
+     *  What is the category's featured image resized filename?
+     *
+     *  If the category does not have a featured image, then use the default featured image.
+     *
+     *  Return the filename of the resized featured image.
+     *
+     * @param   string    $categoryFeaturedImage       The category's featured image (that is in the categories table)
+     * @return  string
+     */
+    public function getCategoryFeaturedImage($categoryFeaturedImage)
+    {
+        // Use the default or a specified category featured image
+        $categoryFeaturedImage = $this->categoryImageDefaultOrSpecified($categoryFeaturedImage);
+
+        // What is the full image filename that the template needs to use?
+        return $this->categoryImageResizedFilename($categoryFeaturedImage);
+    }
+
+    /**
+     * Is the category featured image a specified image; or, the default image?
+     *
+     * @param   string     $categoryFeaturedImage    The category's featured image (that is in the categories table)
+     * @return  string
+     */
+    public function categoryImageDefaultOrSpecified($categoryFeaturedImage)
+    {
+        if ($categoryFeaturedImage == "") return Config::get('lasallecmsfrontend.default_category_image');
+
+        return $categoryFeaturedImage;
+    }
+
+    /**
+     * What is the name of the resized category featured image that the view will use?
+     *
+     * Does not actually resize the image!
+     *
+     * ASSUMES THAT THERE IS JUST ONE RESIZED CATEGORY IMAGE
+     *
+     * @param   string     $categoryFeaturedImage    The category's featured image (that is in the categories table)
+     * @return  string
+     */
+    public function categoryImageResizedFilename($categoryFeaturedImage)
+    {
+        // grab the image sizes to create from the config
+        $imageSizes = Config::get('lasallecmsfrontend.category_featured_image_size');
+
+        // filename
+        $fileNameWithNoExtension = $this->filenameWithNoExtension($categoryFeaturedImage);
+        $fileNameExtension       = $this->filenameWithExtensionOnly($categoryFeaturedImage);
+
+        // iterate through the image sizes, even though there is just one size
+        foreach ($imageSizes as $width => $height)
+        {
+            return $fileNameWithNoExtension.'-'.$width.'x'.$height.'.'.$fileNameExtension;
+        }
+    }
+
+
+
+    /**
+     * Create resized image files for the category featured image
+     *
+     * @param   string  $filename          Category's UN-resized image's filename
+     * @return  void
+     */
+    public function createCategoryResizedImageFiles($filename)
+    {
+        // Use the default or a specified category featured image
+        $filename = $this->categoryImageDefaultOrSpecified($filename);
+
+        // grab the image sizes to create from the config
+        $imageSizes = Config::get('lasallecmsfrontend.category_featured_image_size');
+
+        // iterate through the sizes to create new image files for each size
+        foreach ($imageSizes as $width => $height)
+        {
+            if (!$this->isFileExist($this->pathFilenameOfResizedImage($filename, $width, $height)))
+            {
+                $this->resize($filename, $width, $height);
+                $this->resizeAt2x($filename, $width, $height);
+            }
+        }
+    }
+
+
+
+    ///////////////////////////////////////////////////////////////////
+    ///       SUPPORTING METHODS FOR THE MAIN IMAGE HELPERS         ///
+    ///////////////////////////////////////////////////////////////////
 
     /**
      * Resize the image using the terrific Intervention package
@@ -101,6 +256,7 @@ class ImagesHelper
         // http://image.intervention.io/api/resize
         // closure prevents possible upsizing
         $img->resize($width, $height, function ($constraint) {
+            $constraint->aspectRatio();
             $constraint->upsize();
         });
 
@@ -128,6 +284,7 @@ class ImagesHelper
         // http://image.intervention.io/api/resize
         // closure prevents possible upsizing
         $img->resize($widthAt2x , $heightAt2x, function ($constraint) {
+            $constraint->aspectRatio();
             $constraint->upsize();
         });
 
