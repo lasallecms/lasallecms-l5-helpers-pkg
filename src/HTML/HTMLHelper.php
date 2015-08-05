@@ -241,6 +241,8 @@ class HTMLHelper
      */
     public static function finagleVarcharFieldTypeForIndexListing($field, $data)
     {
+   	if (empty($field['persist_wash'])) return $data;
+    
         if (strtolower($field['persist_wash']) == "url")
         {
             $prefacedURL = self::prefaceURLwithHTTP($data);
