@@ -636,8 +636,90 @@ class HTMLHelper
     }
 
 
+
     ///////////////////////////////////////////////////////////////////
-    /////                  SOCIAL MEDIA TAGS                     //////
+    /////          META & SOCIAL MEDIA TAGS FOR SHOWS            //////
+    ///////////////////////////////////////////////////////////////////
+
+    /**
+     * Create an array of meta tags and their values for a show.
+     *
+     * @param  object   $show       The show object.
+     * @return array
+     */
+    public static function createMetaTagsForShow($show)
+    {
+        return [
+            'page_title'             => $show->title . '&verbar;' . Config::get('lasallecmsfrontend.og_site_name'),
+            'canonical_url'          => Config('app.url') .'/'. $show->slug,
+            'meta_description'       => $show->meta_description,
+        ];
+    }
+
+    /**
+     * Create an array of OG tags and their values for a show.
+     *
+     * https://developers.facebook.com/docs/sharing/webmasters
+     *
+     * @param  object   $show       The show object.
+     * @return array
+     */
+    public static function createOpenGraphTagsForShow($show)
+    {
+        return [
+            'og:title'               => $show->title,
+            'og:type'                => 'website',
+            'og:url'                 => Config('app.url') .'/'. $show->slug,
+            'og:image'               => Config('app.url') .'/'. Config::get('lasallecastfrontend.images_shows') .'/'. $show->featured_image,
+            'og:description'         => $show->meta_description,
+            'og:site_name'           => Config::get('lasallecmsfrontend.og_site_name'),
+
+        ];
+    }
+
+    /**
+     * Create an array of Twitter tags and their values for a show.
+     *
+     *  https://dev.twitter.com/cards/overview
+     *
+     * @param  object   $show       The show object.
+     * @return array
+     */
+    public static function createTwitterTagsForShow($show)
+    {
+        return [
+            'twitter:card'        => Config::get('lasallecmsfrontend.twitter_card'),
+            'twitter:site'        => Config::get('lasallecmsfrontend.twitter_site'),
+            'twitter:title'       => $show->title,
+            'twitter:description' => $show->meta_description,
+            'twitter:creator'     => Config::get('lasallecmsfrontend.twitter_creator'),
+            'twitter:image:src'   => Config('app.url') .'/'. Config::get('lasallecastfrontend.images_shows') .'/'. $show->featured_image,
+        ];
+    }
+
+    /**
+     * Create an array of Google tags and their values for a show.
+     *
+     *  https://dev.twitter.com/cards/overview
+     *
+     * @param  object   $show       The showt object.
+     * @return array
+     */
+    public static function createGoogleTagsForShow($show)
+    {
+        return [
+            'name'        => $show->title,
+            'description' => $show->meta_description,
+            'image'       => Config('app.url') .'/'. Config::get('lasallecastfrontend.images_shows') .'/'. $show->featured_image,
+        ];
+    }
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////////
+    /////              SOCIAL MEDIA TAGS FOR POSTS               //////
     ///////////////////////////////////////////////////////////////////
 
     /**
@@ -677,7 +759,7 @@ class HTMLHelper
             'twitter:site'        => Config::get('lasallecmsfrontend.twitter_site'),
             'twitter:title'       => $post->title,
             'twitter:description' => $post->meta_description,
-            'twitter:creator'     => Config::get('lasallecmsfrontend.twitter_card'),
+            'twitter:creator'     => Config::get('lasallecmsfrontend.twitter_creator'),
             'twitter:image:src'   => $post->urlImage,
         ];
     }
