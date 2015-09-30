@@ -719,6 +719,101 @@ class HTMLHelper
 
 
     ///////////////////////////////////////////////////////////////////
+    /////    META & SOCIAL MEDIA TAGS FOR PODCAST EPISODES       //////
+    ///////////////////////////////////////////////////////////////////
+
+    /**
+     * Create an array of meta tags and their values for a show.
+     *
+     * @param  object   $show       The show object.
+     * @return array
+     */
+    public static function createMetaTagsForEpisode($episode)
+    {
+        return [
+            'page_title'             => $episode->title . '&verbar;' . Config::get('lasallecmsfrontend.og_site_name'),
+            'canonical_url'          => $episode->canonical_url,
+            'meta_description'       => $episode->meta_description,
+        ];
+    }
+
+    /**
+     * Create an array of OG tags and their values for a show.
+     *
+     * https://developers.facebook.com/docs/sharing/webmasters
+     *
+     * @param  object   $show       The show object.
+     * @return array
+     */
+    public static function createOpenGraphTagsForEpisode($episode, $show)
+    {
+        return [
+            'og:title'               => $episode->title,
+            'og:type'                => 'website',
+            'og:url'                 => Config('app.url') .'/'. $episode->slug,
+            'og:image'               => self::determineEpisodeImagePath($episode, $show),
+            'og:description'         => $episode->meta_description,
+            'og:site_name'           => Config::get('lasallecmsfrontend.og_site_name'),
+
+        ];
+    }
+
+    /**
+     * Create an array of Twitter tags and their values for a show.
+     *
+     *  https://dev.twitter.com/cards/overview
+     *
+     * @param  object   $show       The show object.
+     * @return array
+     */
+    public static function createTwitterTagsForEpisode($episode, $show)
+    {
+        return [
+            'twitter:card'        => Config::get('lasallecmsfrontend.twitter_card'),
+            'twitter:site'        => Config::get('lasallecmsfrontend.twitter_site'),
+            'twitter:title'       => $episode->title,
+            'twitter:description' => $episode->meta_description,
+            'twitter:creator'     => Config::get('lasallecmsfrontend.twitter_creator'),
+            'twitter:image:src'   => self::determineEpisodeImagePath($episode, $show),
+        ];
+    }
+
+    /**
+     * Create an array of Google tags and their values for a show.
+     *
+     *  https://dev.twitter.com/cards/overview
+     *
+     * @param  object   $show       The showt object.
+     * @return array
+     */
+    public static function createGoogleTagsForEpisode($episode, $show)
+    {
+        return [
+            'name'        => $episode->title,
+            'description' => $episode->meta_description,
+            'image'       => self::determineEpisodeImagePath($episode, $show),
+        ];
+    }
+
+    /**
+     * What is the episode's image's path?
+     *
+     * @param $episode
+     * @param $show
+     * @return string
+     */
+    public static function determineEpisodeImagePath($episode, $show)
+    {
+        if (empty($episode->featured_image)) {
+            return Config('app.url') .'/'. Config::get('lasallecastfrontend.images_shows') .'/'. $show->featured_image;
+        }
+
+        return $show->image_file_storage_url . $episode->featured_image;
+    }
+
+
+
+    ///////////////////////////////////////////////////////////////////
     /////              SOCIAL MEDIA TAGS FOR POSTS               //////
     ///////////////////////////////////////////////////////////////////
 
