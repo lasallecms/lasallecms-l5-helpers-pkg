@@ -235,6 +235,61 @@ class ImagesHelper
 
 
     ///////////////////////////////////////////////////////////////////
+    ///       MAIN METHODS FOR THE IMAGE HELPERS FOR TAGS           ///
+    ///////////////////////////////////////////////////////////////////
+
+    /**
+     * What is the name of the resized tag default image that the view will use?
+     *
+     * Does not actually resize the image!
+     *
+     *
+     * @param   string     $defaultTagImage    The defaul_tag_image config setting
+     * @return  string
+     */
+    public function tagImageResizedFilename($defaultTagImage)
+    {
+        // grab the image sizes to create from the config
+        $imageSizes = Config::get('lasallecmsfrontend.default_tag_image_image_size');
+
+        // filename
+        $fileNameWithNoExtension = $this->filenameWithNoExtension($defaultTagImage);
+        $fileNameExtension       = $this->filenameWithExtensionOnly($defaultTagImage);
+
+        // iterate through the image sizes$imageSizes = Config::get('lasallecmsfrontend.image_sizes');, even though there is just one size
+        foreach ($imageSizes as $width => $height)
+        {
+            return $fileNameWithNoExtension.'-'.$width.'x'.$height.'.'.$fileNameExtension;
+        }
+    }
+
+
+
+    /**
+     * Create resized image files for the tag default image
+     *
+     * @param   string     $defaultTagImage    The defaul_tag_image config setting
+     * @return  void
+     */
+    public function tagResizedImageFiles($defaultTagImage)
+    {
+        // grab the image sizes to create from the config
+        $imageSizes = Config::get('lasallecmsfrontend.default_tag_image_image_size');
+
+        // iterate through the sizes to create new image files for each size
+        foreach ($imageSizes as $width => $height)
+        {
+            if (!$this->isFileExist($this->pathFilenameOfResizedImage($defaultTagImage, $width, $height)))
+            {
+                $this->resize($defaultTagImage, $width, $height);
+                $this->resizeAt2x($defaultTagImage, $width, $height);
+            }
+        }
+    }
+
+
+
+    ///////////////////////////////////////////////////////////////////
     ///       SUPPORTING METHODS FOR THE MAIN IMAGE HELPERS         ///
     ///////////////////////////////////////////////////////////////////
 
