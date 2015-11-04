@@ -64,6 +64,16 @@ class HTMLHelper
         } else {
             $html = '<i style="color: red;" class="fa fa-remove fa-lg"></i>';
         }
+
+
+        // Got an error unique to deploying to my Flagship site that is absent in my 
+        // local dev sites: a "0" is evaluated as TRUE, causing an X to display
+        // as check. Adding this extra line, as much as I detest adding it, 
+        // solves the problem. (Nov 03, 2015)
+
+        if ($booleanIsh == 0)
+            $html = '<i style="color: red;" class="fa fa-remove fa-lg"></i>';
+
         return $html;
     }
 
