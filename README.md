@@ -1,4 +1,4 @@
-# USER MANAGEMENT
+# HELPER PACKAGE
 
 [![Build Status](https://img.shields.io/travis/lasallecms/lasallecms-l5-helpers-pkg/master.svg?style=flat-square)](https://travis-ci.org/lasallecms/lasallecms-l5-helpers-pkg)
 [![Total Downloads](https://img.shields.io/packagist/dt/lasallecms/helpers.svg?style=flat-square)](https://packagist.org/packages/lasallecms/helpers)
