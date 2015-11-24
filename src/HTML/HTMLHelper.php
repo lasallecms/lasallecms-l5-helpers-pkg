@@ -314,6 +314,8 @@ class HTMLHelper
         }
         $html .= '</select>';
 
+        $html .= self::renderBootstratMultiselectPlugin(count($categories));
+
         return $html;
     }
 
@@ -367,8 +369,49 @@ class HTMLHelper
         }
         $html .= '</select>';
 
+        $html .= self::renderBootstratMultiselectPlugin(count($categories));
+
         return $html;
     }
+
+
+    /**
+     * The HTML for the Bootstrap Multiselect jQuery plugin
+     * https://github.com/davidstutz/bootstrap-multiselect
+     * params on line 393, bootstrap-multiselect/dist/js/bootstrap-multiselect.js
+     * from Lasallecms\Lasallecmsapi\Repositories/renderBootstratMultiselectPlugin/
+     *     BaseRepository/renderBootstratMultiselectPlugin
+     *
+     * @param  int       $count        The number of categories
+     * @return string
+     */
+    private static function renderBootstratMultiselectPlugin($count)
+    {
+        $html = '<script type="text/javascript">';
+        $html .= '$(document).ready(function() {';
+        $html .= "$('#parent_id').multiselect(";
+        $html .= "{";
+
+        $html .= "nonSelectedText: 'Select a category',";
+        $html .= 'enableHTML: false,';
+
+        if ($count > 10) {
+            $html .= "enableFiltering: true,";
+            $html .= "enableCaseInsensitiveFiltering: false,";
+            $html .= "enableFullValueFiltering: false,";
+            $html .= "filterBehavior: 'text',";
+            $html .= "filterPlaceholder: 'Search...',";
+        }
+
+        $html .= "buttonClass: 'btn btn-default'";
+
+        $html .= "}";
+        $html .= ");";
+        $html .= '});';
+        $html .= '</script>';
+
+        return $html;
+}
 
 
 
