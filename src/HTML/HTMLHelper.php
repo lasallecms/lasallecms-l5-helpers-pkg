@@ -314,7 +314,7 @@ class HTMLHelper
         }
         $html .= '</select>';
 
-        $html .= self::renderBootstratMultiselectPlugin(count($categories));
+        $html .= self::renderBootstrapMultiselectPlugin(count($categories));
 
         return $html;
     }
@@ -369,7 +369,7 @@ class HTMLHelper
         }
         $html .= '</select>';
 
-        $html .= self::renderBootstratMultiselectPlugin(count($categories));
+        $html .= self::renderBootstrapMultiselectPlugin(count($categories));
 
         return $html;
     }
@@ -385,7 +385,7 @@ class HTMLHelper
      * @param  int       $count        The number of categories
      * @return string
      */
-    private static function renderBootstratMultiselectPlugin($count)
+    private static function renderBootstrapMultiselectPlugin($count)
     {
         $html = '<script type="text/javascript">';
         $html .= '$(document).ready(function() {';
@@ -394,6 +394,7 @@ class HTMLHelper
 
         $html .= "nonSelectedText: 'Select a category',";
         $html .= 'enableHTML: false,';
+        $html .= "maxHeight: 200,";
 
         if ($count > 10) {
             $html .= "enableFiltering: true,";
