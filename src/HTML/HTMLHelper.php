@@ -379,8 +379,6 @@ class HTMLHelper
      * The HTML for the Bootstrap Multiselect jQuery plugin
      * https://github.com/davidstutz/bootstrap-multiselect
      * params on line 393, bootstrap-multiselect/dist/js/bootstrap-multiselect.js
-     * from Lasallecms\Lasallecmsapi\Repositories/renderBootstratMultiselectPlugin/
-     *     BaseRepository/renderBootstratMultiselectPlugin
      *
      * @param  int       $count        The number of categories
      * @return string
