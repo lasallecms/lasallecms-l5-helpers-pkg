@@ -952,5 +952,20 @@ class HTMLHelper
 
         return "http://".$url;
     }
+
+    /**
+     * Is URL fully qualified?.
+     *
+     * @param  text  $url
+     * @return bool
+     */
+    public static function isHTTPorHTTPS($url)
+    {
+        if (substr($url, 0, 7 ) == "http://") return true;
+
+        if (substr($url, 0, 8 ) == "https://") return true;
+
+        return false;
+    }
 }
 
