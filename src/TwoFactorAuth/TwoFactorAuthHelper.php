@@ -295,6 +295,29 @@ class TwoFactorAuthHelper
 
 
     /*********************************************************************************/
+    /*                      UPDATE THE USER's LAST LOGIN DB FIELDS                   */
+    /*********************************************************************************/
+
+    /**
+     * UPDATE the user record for fields "last_login" and "last_login_ip"
+     *
+     * @param  int    $userId          User ID
+     * @return void
+     */
+    public function updateUserRecordWithLastlogin($userId) {
+
+        $now = Carbon::now();
+        $ip  = $this->request->getClientIp();
+
+        DB::table('users')
+            ->where('id', $userId)
+            ->update(['last_login' => $now, 'last_login_ip' => $ip] )
+        ;
+    }
+
+
+
+    /*********************************************************************************/
     /*                           TWILIO CONFIG                                       */
     /*********************************************************************************/
 
