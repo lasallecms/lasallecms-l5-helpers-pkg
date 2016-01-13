@@ -154,7 +154,7 @@ class TwoFactorAuthHelper
     /*********************************************************************************/
 
     /**
-     * Is the config/auth 2FA REGISTRATION setting enabled?
+     * Is the config/auth 2FA FRONT-END REGISTRATION setting enabled?
      *
      * @return bool
      */
@@ -166,12 +166,24 @@ class TwoFactorAuthHelper
     }
 
     /**
-     * Is the config/auth 2FA LOGIN setting enabled?
+     * Is the config/auth 2FA FRONT-END LOGIN setting enabled?
      *
      * @return bool
      */
     public function isAuthConfigEnableTwoFactorAuthLogin() {
         if (config('auth.auth_enable_two_factor_authorization_frontend_login')) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Is the config/auth 2FA ADMIN LOGIN setting enabled?
+     *
+     * @return bool
+     */
+    public function isAuthConfigEnableTwoFactorAuthAdminLogin() {
+        if (config('auth.auth_enable_two_factor_authorization_admin_login')) {
             return true;
         }
         return false;
