@@ -30,6 +30,9 @@ namespace Lasallecms\Helpers\TwoFactorAuth;
  *
  */
 
+// LaSalle Software
+use Lasallecms\Helpers\TwoFactorAuth\SendMessagesViaTwilio;
+
 // Laravel facades
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -38,7 +41,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 // Third party classes
-use Aloha\Twilio\Twilio;
 use Carbon\Carbon;
 
 class TwoFactorAuthHelper
@@ -49,12 +51,19 @@ class TwoFactorAuthHelper
     protected $request;
 
     /**
+     * @var Lasallecms\Helpers\TwoFactorAuth\SendMessagesViaTwilio
+     */
+    protected $sendMessagesViaTwilio;
+
+    /**
      * TwoFactorAuthHelper constructor.
      * @param \Illuminate\Http\Request  $request
+     * @param Lasallecms\Helpers\TwoFactorAuth\SendMessagesViaTwilio $twilio
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, SendMessagesViaTwilio $sendMessagesViaTwilio)
     {
         $this->request = $request;
+        $this->sendSMS = $sendMessagesViaTwilio;
     }
 
     /*********************************************************************************/
@@ -62,25 +71,12 @@ class TwoFactorAuthHelper
     /*********************************************************************************/
 
     /**
+     * Two Factor Authorization for the front-end LOGIN
+     *
      * @param  int    $userId          User ID
      * @return void
      */
     public function doTwoFactorAuthLogin($userId) {
-
-        // Piece together the Twilio friendly phone number
-
-        // (i) get the user's country code and phone number
-        $userPhoneCountryCode = $this->getUserPhoneCountryCode($userId);
-        $userPhoneNumber      = $this->getUserPhoneNumber($userId);
-
-        // (ii) concatenate to create the Twilio friendly phone number
-        $phoneNumber  = "+";
-        $phoneNumber .= $userPhoneCountryCode;
-        $phoneNumber .= $userPhoneNumber;
-
-
-        // Get the Twilio config settings
-        $twilioConfigSettings = $this->getTwilioConfig();
 
         // Get the 2FA code
         $codeToInput = $this->getCodeToInput();
@@ -93,21 +89,58 @@ class TwoFactorAuthHelper
         $message .= ". Your two factor authorization login code is ";
         $message .= $codeToInput;
 
-        // Twilio is sms provider of choice right now...
-        $twilio = new \Aloha\Twilio\Twilio($twilioConfigSettings['sid'], $twilioConfigSettings['token'], $twilioConfigSettings['fromNumber']);
-        $twilio->message($phoneNumber, $message);
+        $this->sendSMS->sendSMS($this->getUserPhoneCountryCode($userId), $this->getUserPhoneNumber($userId), $message);
     }
 
     /**
+     * Two Factor Authorization for the front-end REGISTRATION
+     *
+     * @param  array    $data
+     * @return void
+     */
+    public function doTwoFactorAuthRegistration($data) {
+
+        // Get the 2FA code
+        $codeToInput = $this->getCodeToInput();
+
+        // Set this 2FA code into a session variable, since
+        // this is the only opportunity to so save the ephemerally generated 2FA
+        $this->request->session()->put('codeToInput', $codeToInput);
+
+
+        // Put together the SMS message
+        $message  = config('lasallecmsfrontend.site_name');
+        $message .= ". Your two factor authorization login code is ";
+        $message .= $codeToInput;
+
+
+        $this->sendSMS->sendSMS($data['phone_country_code'], $data['phone_number'], $message);
+    }
+
+
+
+    /**
+        echo "<hr>timeDiff = ".$timeDiff;
+        echo "<br>minutes2faFormIsLive = ".$minutes2faFormIsLive;
      * Has too much time passed between issuing the 2FA code and this code being
      * entered into the verification form?
      *
-     * @param  int    $userId          User ID
+     * @param  int       $userId          User ID --> if null, then called by 2FA registration
+     * @param  datetime  $startTime       Time 2FA form created --> if null, then called by 2FA login
      * @return bool
      */
-    public function isTwoFactorAuthFormTimeout($userId) {
+    public function isTwoFactorAuthFormTimeout($userId=null, $startTime=null ) {
 
-        $startTime = strtotime($this->getUserSmsTokenCreatedAt($userId));
+        if (isset($userId)) {
+
+            // User wants to login, performing 2FA for this login
+            $startTime = strtotime($this->getUserSmsTokenCreatedAt($userId));
+        } else {
+
+            // New front-end registration, performing 2FA for this registration
+            $startTime = strtotime($startTime);
+        }
+
         $now       = strtotime(Carbon::now());
 
         // The time difference is in seconds, we want in minutes
@@ -117,11 +150,15 @@ class TwoFactorAuthHelper
 
         if ($timeDiff > $minutes2faFormIsLive) {
 
-            // clear out the user's 2FA sms code and timestamp
-            $this->clearUserTwoFactorAuthFields($userId);
+            if (isset($userId)) {
+                // clear out the user's 2FA sms code and timestamp
+                $this->clearUserTwoFactorAuthFields($userId);
 
-            // clear the user_id session variable
-            $this->clearUserIdSessionVar();
+                // clear the user_id session variable
+                $this->clearUserIdSessionVar();
+            } else {
+                $this->clearTwoFactorAuthCodeToInput();
+            }
 
             return true;
         }
@@ -132,13 +169,20 @@ class TwoFactorAuthHelper
     /**
      * Did the user input the correct 2FA code?
      *
-     * @param  int    $userId          User ID
+     * @param  int    $userId                      User ID --> if null, then called by 2FA registration;
+     *                                             otherwise, called by 2FA login
+
      * @return bool
      */
-    public function isInputtedTwoFactorAuthCodeCorrect($userId) {
+    public function isInputtedTwoFactorAuthCodeCorrect($userId=null) {
         $inputted2faCode = $this->request->input('2facode');
 
-        $sent2faCode     = $this->getUserSmsToken($userId);
+        if (isset($userId)) {
+            $sent2faCode     = $this->getUserSmsToken($userId);
+        } else {
+            $sent2faCode     = $this->request->session()->get('codeToInput');
+        }
+
 
         if ($inputted2faCode == $sent2faCode) {
             return true;
@@ -286,10 +330,15 @@ class TwoFactorAuthHelper
      * @return void
      */
     public function clearUserTwoFactorAuthFields($userId) {
-        DB::table('users')
-            ->where('id', $userId)
-            ->update(['sms_token' => null, 'sms_token_created_at' => null] )
-        ;
+            DB::table('users')
+                ->where('id', $userId)
+                ->update(['sms_token' => null, 'sms_token_created_at' => null]);
+
+    }
+
+
+    public function clearTwoFactorAuthCodeToInput() {
+        return $this->request->session()->remove('CodeToInput');
     }
 
 
@@ -313,31 +362,6 @@ class TwoFactorAuthHelper
             ->where('id', $userId)
             ->update(['last_login' => $now, 'last_login_ip' => $ip] )
         ;
-    }
-
-
-
-    /*********************************************************************************/
-    /*                           TWILIO CONFIG                                       */
-    /*********************************************************************************/
-
-    /**
-     * Get the Twilio config settings from the laravel-twilio package
-     *
-     * @param  text  $conection    The connection to fetch. Can have multiple Twilio connections in the config.
-     * @return  array
-     */
-    public function getTwilioConfig($connection='twilio')
-    {
-        $twilioconfig   = config('twilio.twilio');
-
-        $configSettings = [];
-
-        $configSettings['sid']        = $twilioconfig['connections'][$connection]['sid'];
-        $configSettings['token']      = $twilioconfig['connections'][$connection]['token'];
-        $configSettings['fromNumber'] = $twilioconfig['connections'][$connection]['from'];
-
-        return $configSettings;
     }
 
 
