@@ -258,6 +258,29 @@ class TwoFactorAuthHelper
     }
 
     /**
+     * Does the user have a country code and phone number for 2FA?
+     *
+     * @param  int    $userId          User ID
+     */
+    public function existstUserCountryCodeAndPhoneNumber($userId) {
+        $countryCode = DB::table('users')
+            ->where('id', '=', $userId)
+            ->value('phone_country_code')
+        ;
+
+        $phoneNumber =  DB::table('users')
+            ->where('id', '=', $userId)
+            ->value('phone_number')
+        ;
+
+        if ((!$countryCode) || (!$phoneNumber)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * The user's phone's country code
      *
      * @param  int    $userId          User ID
