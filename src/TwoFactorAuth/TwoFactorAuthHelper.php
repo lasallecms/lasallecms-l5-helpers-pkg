@@ -350,6 +350,8 @@ class TwoFactorAuthHelper
     /**
      * UPDATE the user record for fields "last_login" and "last_login_ip"
      *
+     * This method is here because it is convenient, as this class is already injected in the auth classes
+     *
      * @param  int    $userId          User ID
      * @return void
      */
