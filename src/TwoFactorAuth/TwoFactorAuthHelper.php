@@ -35,6 +35,7 @@ use Lasallecms\Helpers\TwoFactorAuth\SendMessagesViaTwilio;
 
 // Laravel facades
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 
 // Laravel classes
@@ -43,6 +44,10 @@ use Illuminate\Http\Request;
 // Third party classes
 use Carbon\Carbon;
 
+/**
+ * Class TwoFactorAuthHelper
+ * @package Lasallecms\Helpers\TwoFactorAuth
+ */
 class TwoFactorAuthHelper
 {
     /**
@@ -388,6 +393,65 @@ class TwoFactorAuthHelper
             ->update(['last_login' => $now, 'last_login_ip' => $ip] )
         ;
     }
+
+
+
+    /*********************************************************************************/
+    /*                             2FA COOKIES                                       */
+    /*********************************************************************************/
+
+    /**
+     * Set (make) the 2FA cookie
+     *
+     * @param  Illuminate\Http\Response  $response
+     * @return Illuminate\Http\Response
+     */
+    public function setCookie($response) {
+
+        if (!config('auth.auth_2fa_cookie_enable')) {
+            return false;
+        }
+
+
+        if (!Cookie::has('successful_login')) {
+
+            // what is the cookie's lifetime, in minutes
+
+            $numberOfDays = config('auth.auth_2fa_cookie_lifetime_days');
+
+            // the max number of days is 30, and the min is 1
+            if ($numberOfDays > 30) {
+                $numberOfDays = 30;
+            }
+            if ($numberOfDays < 1) {
+                $numberOfDays = 1;
+            }
+
+            // convert days to minutes -- there are 1,440 minutes in a day
+            $numberOfMinutes = $numberOfDays * 1440;
+
+            return $response->withCookie(cookie('successful_login', Carbon::now(), $numberOfMinutes));
+        }
+
+        return $response;
+    }
+
+    /**
+     * Does the 2FA cookie exist?
+     *
+     * @return bool
+     */
+    public function isCookieExists() {
+
+        //if (Cookie::has('successful_login')) {
+        if (Cookie::has('successful_login')) {
+
+            return true;
+        }
+
+        return false;
+    }
+
 
 
 
