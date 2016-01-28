@@ -408,11 +408,6 @@ class TwoFactorAuthHelper
      */
     public function setCookie($response) {
 
-        if (!config('auth.auth_2fa_cookie_enable')) {
-            return false;
-        }
-
-
         if (!Cookie::has('successful_login')) {
 
             // what is the cookie's lifetime, in minutes
