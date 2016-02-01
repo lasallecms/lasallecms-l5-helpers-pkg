@@ -151,7 +151,7 @@ class TwoFactorAuthHelper
         // The time difference is in seconds, we want in minutes
         $timeDiff = ($now - $startTime)/60;
 
-        $minutes2faFormIsLive = config('auth.auth_2fa_minutes_smscode_is_live');
+        $minutes2faFormIsLive = config('lasallecmsusermanagement.auth_2fa_minutes_smscode_is_live');
 
         if ($timeDiff > $minutes2faFormIsLive) {
 
@@ -208,7 +208,7 @@ class TwoFactorAuthHelper
      * @return bool
      */
     public function isAuthConfigEnableTwoFactorAuthRegistration() {
-        if (config('auth.auth_enable_two_factor_authorization_frontend_registration')) {
+        if (config('lasallecmsusermanagement.auth_enable_two_factor_authorization_frontend_registration')) {
             return true;
         }
         return false;
@@ -220,7 +220,7 @@ class TwoFactorAuthHelper
      * @return bool
      */
     public function isAuthConfigEnableTwoFactorAuthLogin() {
-        if (config('auth.auth_enable_two_factor_authorization_frontend_login')) {
+        if (config('lasallecmsusermanagement.auth_enable_two_factor_authorization_frontend_login')) {
             return true;
         }
         return false;
@@ -232,7 +232,7 @@ class TwoFactorAuthHelper
      * @return bool
      */
     public function isAuthConfigEnableTwoFactorAuthAdminLogin() {
-        if (config('auth.auth_enable_two_factor_authorization_admin_login')) {
+        if (config('lasallecmsusermanagement.auth_enable_two_factor_authorization_admin_login')) {
             return true;
         }
         return false;
@@ -412,7 +412,7 @@ class TwoFactorAuthHelper
 
             // what is the cookie's lifetime, in minutes
 
-            $numberOfDays = config('auth.auth_2fa_cookie_lifetime_days');
+            $numberOfDays = config('lasallecmsusermanagement.auth_2fa_cookie_lifetime_days');
 
             // the max number of days is 30, and the min is 1
             if ($numberOfDays > 30) {
