@@ -125,8 +125,6 @@ class TwoFactorAuthHelper
 
 
     /**
-        echo "<hr>timeDiff = ".$timeDiff;
-        echo "<br>minutes2faFormIsLive = ".$minutes2faFormIsLive;
      * Has too much time passed between issuing the 2FA code and this code being
      * entered into the verification form?
      *
