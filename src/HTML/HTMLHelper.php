@@ -171,7 +171,7 @@ class HTMLHelper
         {
             if (strtolower($title) == "green")
             {
-                //return '<button type="button" class="btn btn-success btn-sm">'.$title.'</button>';
+                return '<button type="button" class="btn btn-success btn-sm">'.$title.'</button>';
             }
 
             if (strtolower($title) == "yellow")
