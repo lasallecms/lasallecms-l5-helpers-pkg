@@ -1,4 +1,5 @@
 <?php
+
 namespace Lasallecms\Helpers\HTML;
 
 /**
@@ -26,7 +27,7 @@ namespace Lasallecms\Helpers\HTML;
  * @license    http://www.gnu.org/licenses/gpl-3.0.html
  * @author     The South LaSalle Trading Corporation
  * @email      info@southlasalle.com
- *s
+ *
  */
 
 // LaSalle Software
@@ -37,7 +38,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 
-/*
+
+/**
  * HTML helpers
  */
 class HTMLHelper
@@ -46,14 +48,14 @@ class HTMLHelper
     ///////////////////    MAINLY FOR INDEX LISTING    ////////////////
     ///////////////////////////////////////////////////////////////////
 
-    /*
+    /**
      * Convert yes/no to "check" or "remove" bootstrap buttons
      *
      * @param  mixed  $boolean-ish  Either "yes/no", 0/1, "true/false", true/false
      * @return string
      */
-    public static function convertToCheckOrXBootstrapButtons($booleanIsh)
-    {
+    public static function convertToCheckOrXBootstrapButtons($booleanIsh) {
+
         if (
             (strtolower($booleanIsh == "yes"))
             || ($booleanIsh == 1)
@@ -77,15 +79,14 @@ class HTMLHelper
         return $html;
     }
 
-    /*
+    /**
      * Insert a bootstrap button to go back to the previous page.
      * Usage in your view: {!! back_button('Cancel') !!}
      *
      * @param  string  $body  Text that will display in the button
      * @return string
      */
-    public static function back_button($body = 'Go Back')
-    {
+    public static function back_button($body = 'Go Back') {
         $html ='<a class="btn btn-default btn-xs" href="';
         $html .= URL::previous();
         $html .= '" ';
@@ -96,19 +97,18 @@ class HTMLHelper
         return $html;
     }
 
-    /*
+    /**
      * Insert a link to go back to the previous page.
      * Usage in your view: {!! link_back('Cancel') !!}
      *
      * @param  string  $body  Text that will display in the link
      * @return string
      */
-    public static function back_link($body = 'Go Back')
-    {
+    public static function back_link($body = 'Go Back') {
         return link_to(URL::previous(), $body);
     }
 
-    /*
+    /**
      * Format a db result set where an element is displayed on a separate line.
      * Eg: A nice little list of categories for each post_id, with
      *     each category on a separate line,
@@ -116,16 +116,15 @@ class HTMLHelper
      * @param  array  $results
      * @return text
      */
-    public static function listSingleCollectionElementOnSeparateRow($results, $element = "title")
-    {
-        if (count($results) <1 ) return '<span class="text-danger">n/a</span>';
+    public static function listSingleCollectionElementOnSeparateRow($results, $element = "title") {
+        if (count($results) <1 ) {
+            return '<span class="text-danger">n/a</span>';
+        }
 
         $html = "";
         $i = 1;
-        foreach ($results as $result)
-        {
-            if ($i == 1)
-            {
+        foreach ($results as $result) {
+            if ($i == 1) {
                 $html .= $result->$element;
             } else {
                 $html .= "<br />".$result->$element;
@@ -136,7 +135,7 @@ class HTMLHelper
         return $html;
     }
 
-    /*
+    /**
      * Grab the title by ID
      *
      *
@@ -144,43 +143,38 @@ class HTMLHelper
      * @param    int        $id
      * @return   string
      */
-    public static function getTitleById($table, $id)
-    {
+    public static function getTitleById($table, $id) {
 
         //return "table = ".$table." and id = ".$id;
 
         // Special handling for users
-        if ($table == "users")
-        {
+        if ($table == "users") {
             return self::getUserForIndexListing($id);
         }
 
         // Special handling for posts (for post updates listing)
-        if ($table == "posts")
-        {
+        if ($table == "posts") {
             return self::getPostForIndexListing($id);
         }
 
         $title = DB::table($table)->where('id', '=', $id)->pluck('title');
 
-        if ($title == "") return '<span class="text-danger">n/a</span>';
-
+        if ($title == "") {
+            return '<span class="text-danger">n/a</span>';
+        }
 
         // ASSIGN COLOURS TO lookup_todo_priority_types
-        if ($table == "lookup_todo_priority_types")
-        {
-            if (strtolower($title) == "green")
-            {
+        if ($table == "lookup_todo_priority_types") {
+
+            if (strtolower($title) == "green") {
                 return '<button type="button" class="btn btn-success btn-sm">'.$title.'</button>';
             }
 
-            if (strtolower($title) == "yellow")
-            {
+            if (strtolower($title) == "yellow") {
                 return '<button type="button" class="btn btn-warning btn-sm">'.$title.'</button>';
             }
 
-            if (strtolower($title) == "red")
-            {
+            if (strtolower($title) == "red") {
                 return '<button type="button" class="btn btn-danger btn-sm">'.$title.'</button>';
             }
 
@@ -189,7 +183,7 @@ class HTMLHelper
         return $title;
     }
 
-    /*
+    /**
      * Grab the User info from the "Users" table.
      * Created specifically for the CRM "People" index listing, but
      * displays in the post update create/edit form.
@@ -197,13 +191,12 @@ class HTMLHelper
      * @param    int        $id
      * @return   string
      */
-    public static function getUserForIndexListing($id)
-    {
+    public static function getUserForIndexListing($id) {
+
         $user = DB::table('users')->where('id', $id)->first();
 
         // A customer in LaSalleCRM does *NOT* have to be a LaSalle Software user
-        if (empty($user->id))
-        {
+        if (empty($user->id)){
             return "n/a";
         }
 
@@ -214,15 +207,15 @@ class HTMLHelper
         return $html;
     }
 
-    /*
+    /**
      * Grab the Post info from the "posts" table.
      * Created specifically for the "Post Updates" index listing
      *
      * @param    int        $id
      * @return   string
      */
-    public static function getPostForIndexListing($id)
-    {
+    public static function getPostForIndexListing($id) {
+
         // Actually, it's dangerous and confusing to have the link to the post's EDIT
         // form display in the post update's create/edit form. So, I am omitting
         // the link; and, instead, am displaying the post's title with the post's
@@ -242,19 +235,19 @@ class HTMLHelper
     }
 
 
-    /*
+    /**
      * Need a helper method to finagle the varchar field in the index listing.
      *
      * @param   array   $field
      * @param   string  $data
      * @return  string
      */
-    public static function finagleVarcharFieldTypeForIndexListing($field, $data)
-    {
-   	if (empty($field['persist_wash'])) return $data;
+    public static function finagleVarcharFieldTypeForIndexListing($field, $data) {
+   	if (empty($field['persist_wash'])) {
+            return $data;
+        }
     
-        if (strtolower($field['persist_wash']) == "url")
-        {
+        if (strtolower($field['persist_wash']) == "url") {
             $prefacedURL = self::prefaceURLwithHTTP($data);
             return '<a href="'.$prefacedURL.'" target="_blank">'.$data.'</a>';
         }
@@ -270,28 +263,29 @@ class HTMLHelper
     ///////////    AS CATEGORY HAS ITSELF AS PARENT_ID     ////////////
     ///////////////////////////////////////////////////////////////////
 
-    /*
+    /**
      * Display the parent category
      *
      * @param  int         $parent_id
      * @param  eloquent    $categoryRepository   The category repository
      * @return string
      */
-    public static function displayParentCategoryTitle($parent_id, $categoryRepository)
-    {
-        if ($parent_id == 0) return "n/a";
+    public static function displayParentCategoryTitle($parent_id, $categoryRepository) {
+        if ($parent_id == 0) { 
+            return "n/a";
+        }
 
         return $categoryRepository->getFind($parent_id)->title;
     }
 
-    /*
+    /**
      * Create a dropdown with a single select for the parent category
      *
      * @param  collection  $categories  Laravel collection object of category
      * @return string
      */
-    public static function categoryParentSingleSelectCreate($categories)
-    {
+    public static function categoryParentSingleSelectCreate($categories) {
+
         // STEP 1: Initiatize the html select tag
         $html = "";
         $html .= '<select name="parent_id" id="parent_id" size="6" class="form-control" >';
@@ -319,7 +313,7 @@ class HTMLHelper
         return $html;
     }
 
-    /*
+    /**
      * Create a multiple select drop down for tags
      * that have the existing tags for that post already selected
      *
@@ -330,15 +324,17 @@ class HTMLHelper
      * @param  int              $category id       category's id
      * @return string
      */
-    public static function categoryParentSingleSelectEdit($categories, $parent_id, $category_id)
-    {
+    public static function categoryParentSingleSelectEdit($categories, $parent_id, $category_id) {
+
         // STEP 1: Initiatize the html select tag
         $html = "";
         $html .=  '<select name="parent_id" id="parent_id" size="6" class="form-control">';
 
         $html .= '<option ';
 
-        if ( $parent_id == 0)  $html .= ' selected="selected" ';
+        if ( $parent_id == 0) {
+            $html .= ' selected="selected" ';
+        }
 
         $html .= 'value="';
         $html .= 0;
@@ -347,18 +343,19 @@ class HTMLHelper
         $html .= '</option>"';
 
         // STEP 2: Construct the <option></option> categories for ALL categories in the categories table
-        foreach ($categories as $category)
-        {
-            if ($category->id == $category_id) continue;
+        foreach ($categories as $category) {
 
+            if ($category->id == $category_id) {
+                continue;
+            }
 
             // If this tag is attached to the post, then SELECTED it
-            if ( $category->id == $parent_id )
-            {
+            $selected = "";
+
+            if ( $category->id == $parent_id ) {
                 $selected = ' selected="selected" ';
-            } else {
-                $selected = "";
-            }
+            } 
+
             $html .= '<option ';
             $html .= $selected;
             $html .= 'value="';
@@ -383,8 +380,8 @@ class HTMLHelper
      * @param  int       $count        The number of categories
      * @return string
      */
-    private static function renderBootstrapMultiselectPlugin($count)
-    {
+    private static function renderBootstrapMultiselectPlugin($count) {
+
         $html = '<script type="text/javascript">';
         $html .= '$(document).ready(function() {';
         $html .= "$('#parent_id').multiselect(";
@@ -418,7 +415,7 @@ class HTMLHelper
     /////////////////     ADMIN TITLE HELPERS       ///////////////////
     ///////////////////////////////////////////////////////////////////
 
-    /*
+    /**
      * Page title for admin pages
      *
      * @param  string           $package_title       package's title
@@ -426,8 +423,8 @@ class HTMLHelper
      * @param  string           $extra_title         extra text to append to the table's title
      * @return string
      */
-    public static function adminPageTitle($package_title, $table_type_plural, $extra_title='')
-    {
+    public static function adminPageTitle($package_title, $table_type_plural, $extra_title='') {
+
         $table_type_plural = self::properPlural($table_type_plural);
 
         $html  = '';
@@ -444,7 +441,7 @@ class HTMLHelper
         return $html;
     }
 
-    /*
+    /**
      * Display button with a label describing what the form is doing.
      *
      * @param  object           $record       Optional record from the database
@@ -452,8 +449,7 @@ class HTMLHelper
      * @param  bool             $show         True when from controller SHOW
      * @return string
      */
-    public static function adminPageSubTitle($record = null, $modelClass, $show=false)
-    {
+    public static function adminPageSubTitle($record = null, $modelClass, $show=false) {
 
         $modelClass = self::properPlural($modelClass);
 
@@ -465,10 +461,10 @@ class HTMLHelper
         $html .= '<span class="label label-info">';
 
         // Edit or Create?
-        if ($record)
-        {
-            if ($show)
-            {
+        if ($record) {
+
+            $html .= 'Edit the ';
+            if ($show) {
                 $html .= 'Show the ';
             } else {
                 $html .= 'Edit the ';
@@ -478,6 +474,7 @@ class HTMLHelper
             $html .= ': "';
             $html .= $record->title;
             $html .= '"';
+
         } else {
             $html .= 'Create ';
             $html .= ucwords($modelClass);
@@ -498,21 +495,20 @@ class HTMLHelper
     /////////////     ADMIN FORM FIELD HELPERS       //////////////////
     ///////////////////////////////////////////////////////////////////
 
-    /*
+    /**
      * Transform the field name into a format suitable for a form label
      *
      * @param  array  $field   Form field array from the model
      * @return string
      */
-    public static function adminFormFieldLabel($field)
-    {
+    public static function adminFormFieldLabel($field) {
+
         // Does the field have an alternate name?
-        if (!empty($field['alternate_form_name']))
-        {
+        $name = $field['name'];
+
+        if (!empty($field['alternate_form_name'])) {
             $name = $field['alternate_form_name'];
-        } else {
-            $name = $field['name'];
-        }
+        } 
 
         if ($name == "id") return "ID";
 
@@ -521,7 +517,7 @@ class HTMLHelper
         return $html;
     }
 
-    /*
+    /**
      * Create button for admin pages
      *
      * @param  string           $resource_route_name        resource route's name
@@ -529,8 +525,7 @@ class HTMLHelper
      * @param  string           $pull                       bootstrap "pull" left or right
      * @return string
      */
-    public static function adminCreateButton($resource_route_name, $button_label, $pull="right")
-    {
+    public static function adminCreateButton($resource_route_name, $button_label, $pull="right") {
         $full_url = route('admin.'.$resource_route_name.'.create');
 
         $button_label = self::pluralToSingular($button_label);
@@ -545,7 +540,7 @@ class HTMLHelper
         return $html;
     }
 
-    /*
+    /**
      * Create button for admin pages
      *
      * @param  string           $resource_route_name        resource route's name
@@ -554,13 +549,16 @@ class HTMLHelper
      * @param  string           $icon                       specify icon, optional
      * @return string
      */
-    public static function adminIndexButton($resource_route_name, $message=null, $pull="right", $icon="")
-    {
+    public static function adminIndexButton($resource_route_name, $message=null, $pull="right", $icon="") {
         $full_url = route('admin.'.$resource_route_name.'.index');
 
-        if (!$message) $message = $resource_route_name;
+        if (!$message) {
+            $message = $resource_route_name;
+        }
 
-        if ($icon == "") $icon = 'glyphicon glyphicon-heart-empty';
+        if ($icon == "") {
+            $icon = 'glyphicon glyphicon-heart-empty';
+        }
 
         $html  = '';
         $html .= '<a class="btn btn-default pull-'.$pull.'"';
@@ -569,33 +567,33 @@ class HTMLHelper
         $html .= '" role="button">';
         $html .= '<span class=".$icon."></span>  '.$message;
         $html .= '</a><br /><br /><br />';
+
         return $html;
     }
 
 
-    /*
+    /**
      * Return grammatically correct singularizations.
      *
      * @param  string           $pluralWordToCheck                   Plural word to check
      * @return string
      */
-    public static function pluralToSingular($pluralWordToCheck)
-    {
+    public static function pluralToSingular($pluralWordToCheck) {
         $listOfSingular = [
-            'categories' => 'category',
-            'kb_item'    => 'knowledge base item',
-            'list_email' => 'email list',
-            'listlist'   => 'list',
-            'people'     => 'person',
-            'peoples'    => 'person',
-            'social'     => 'social site',
-            'todo_item'  => 'to do item',
+            'categories'    => 'category',
+            'kb_item'       => 'knowledge base item',
+            'list_email'    => 'email list',
+            'listlist'      => 'list',
+            'people'        => 'person',
+            'peoples'       => 'person',
+            'social'        => 'social site',
+            'todo_item'     => 'to do item',
+            'email_message' => 'email message',
         ];
 
-        foreach ($listOfSingular as $plural => $singular)
-        {
-            if (strtolower($pluralWordToCheck) == strtolower($plural))
-            {
+        foreach ($listOfSingular as $plural => $singular) {
+
+            if (strtolower($pluralWordToCheck) == strtolower($plural)) {
                 return $singular;
             }
         }
@@ -603,23 +601,21 @@ class HTMLHelper
         return $pluralWordToCheck;
     }
 
-    /*
+    /**
      * Return grammatically correct singularizations.
      *
      * @param  string           $pluralWordToCheck                   Plural word to check
      * @return string
      */
-    public static function singularToPlural($singularWordToCheck)
-    {
+    public static function singularToPlural($singularWordToCheck) {
         $listOfPlurals = [
             'category' => 'categories',
             'person'   => 'peoples',
         ];
 
-        foreach ($listOfPlurals as $singular => $plural)
-        {
-            if (strtolower($singularWordToCheck) == strtolower($plural))
-            {
+        foreach ($listOfPlurals as $singular => $plural) {
+
+            if (strtolower($singularWordToCheck) == strtolower($plural)) {
                 return $plural;
             }
         }
@@ -628,7 +624,7 @@ class HTMLHelper
     }
 
 
-    /*
+    /**
      * Is the plural word grammatically correct?
      *
      * Also, a method to specify custom admin form subtitle names (regular create/edit forms),
@@ -637,28 +633,28 @@ class HTMLHelper
      * @param  string           $pluralWordToCheck                   Plural word to check
      * @return string
      */
-    public static function properPlural($pluralWordToCheck)
-    {
+    public static function properPlural($pluralWordToCheck) {
         $listOfPlurals = [
-            'categorys'   => 'categories',
-            'kb_item'     => 'item',
-            'kb_items'    => 'Items',
-            'list_email'  => 'email list',
-            'listlist'    => 'list',
-            'people'      => 'person',
-            'peoples'     => 'people',
-            'postupdate'  =>'post update',
-            'postupdates' =>'post updates',
-            'social'      => 'social site',
-            'socials'     => 'social sites',
-            'todo_items'  => 'To Do items',
-            'Todo_item'   => 'To Do Item',
+            'categorys'      => 'categories',
+            'kb_item'        => 'item',
+            'kb_items'       => 'Items',
+            'list_email'     => 'email list',
+            'listlist'       => 'list',
+            'people'         => 'person',
+            'peoples'        => 'people',
+            'postupdate'     =>'post update',
+            'postupdates'    =>'post updates',
+            'social'         => 'social site',
+            'socials'        => 'social sites',
+            'todo_items'     => 'To Do items',
+            'Todo_item'      => 'To Do Item',
+            'email_messages' => 'Email Messages',
+            'email_message'  => 'Email Message',
         ];
 
-        foreach ($listOfPlurals as $improperPlural => $correctPlural)
-        {
-            if (strtolower($improperPlural) == strtolower($pluralWordToCheck))
-            {
+        foreach ($listOfPlurals as $improperPlural => $correctPlural) {
+
+            if (strtolower($improperPlural) == strtolower($pluralWordToCheck)) {
                 return $correctPlural;
             }
         }
@@ -671,6 +667,7 @@ class HTMLHelper
     ///////////////////////////////////////////////////////////////////
     ////////     POST UPDATE QUERY FOR USE IN BLADE FILES      ////////
     ///////////////////////////////////////////////////////////////////
+
     /**
      * Find the Post Updates for a given post.
      *
@@ -679,12 +676,12 @@ class HTMLHelper
      * @param  int         $post_id        The post's ID
      * @return collection
      */
-    public static function findPostupdatesByPostId($post_id)
-    {
+    public static function findPostupdatesByPostId($post_id) {
         return DB::table('postupdates')
             ->where('post_id', '=', $post_id)
             ->where('enabled', '=', 1)
-            ->get();
+            ->get()
+        ;
     }
 
 
@@ -699,8 +696,7 @@ class HTMLHelper
      * @param  object   $show       The show object.
      * @return array
      */
-    public static function createMetaTagsForShow($show)
-    {
+    public static function createMetaTagsForShow($show) {
         return [
             'page_title'             => $show->title . '&verbar;' . Config::get('lasallecmsfrontend.og_site_name'),
             'canonical_url'          => Config('app.url') .'/'. $show->slug,
@@ -716,8 +712,7 @@ class HTMLHelper
      * @param  object   $show       The show object.
      * @return array
      */
-    public static function createOpenGraphTagsForShow($show)
-    {
+    public static function createOpenGraphTagsForShow($show) {
         return [
             'og:title'               => $show->title,
             'og:type'                => 'website',
@@ -737,8 +732,7 @@ class HTMLHelper
      * @param  object   $show       The show object.
      * @return array
      */
-    public static function createTwitterTagsForShow($show)
-    {
+    public static function createTwitterTagsForShow($show) {
         return [
             'twitter:card'        => Config::get('lasallecmsfrontend.twitter_card'),
             'twitter:site'        => Config::get('lasallecmsfrontend.twitter_site'),
@@ -757,8 +751,7 @@ class HTMLHelper
      * @param  object   $show       The showt object.
      * @return array
      */
-    public static function createGoogleTagsForShow($show)
-    {
+    public static function createGoogleTagsForShow($show) {
         return [
             'name'        => $show->title,
             'description' => $show->meta_description,
@@ -780,8 +773,7 @@ class HTMLHelper
      * @param  object   $show       The show object.
      * @return array
      */
-    public static function createMetaTagsForEpisode($episode)
-    {
+    public static function createMetaTagsForEpisode($episode) {
         return [
             'page_title'             => $episode->title . '&verbar;' . Config::get('lasallecmsfrontend.og_site_name'),
             'canonical_url'          => $episode->canonical_url,
@@ -797,8 +789,7 @@ class HTMLHelper
      * @param  object   $show       The show object.
      * @return array
      */
-    public static function createOpenGraphTagsForEpisode($episode, $show)
-    {
+    public static function createOpenGraphTagsForEpisode($episode, $show) {
         return [
             'og:title'               => $episode->title,
             'og:type'                => 'website',
@@ -818,8 +809,7 @@ class HTMLHelper
      * @param  object   $show       The show object.
      * @return array
      */
-    public static function createTwitterTagsForEpisode($episode, $show)
-    {
+    public static function createTwitterTagsForEpisode($episode, $show) {
         return [
             'twitter:card'        => Config::get('lasallecmsfrontend.twitter_card'),
             'twitter:site'        => Config::get('lasallecmsfrontend.twitter_site'),
@@ -838,8 +828,7 @@ class HTMLHelper
      * @param  object   $show       The showt object.
      * @return array
      */
-    public static function createGoogleTagsForEpisode($episode, $show)
-    {
+    public static function createGoogleTagsForEpisode($episode, $show) {
         return [
             'name'        => $episode->title,
             'description' => $episode->meta_description,
@@ -854,8 +843,7 @@ class HTMLHelper
      * @param $show
      * @return string
      */
-    public static function determineEpisodeImagePath($episode, $show)
-    {
+    public static function determineEpisodeImagePath($episode, $show) {
         if (empty($episode->featured_image)) {
             return Config('app.url') .'/'. Config::get('lasallecastfrontend.images_shows') .'/'. $show->featured_image;
         }
@@ -877,8 +865,7 @@ class HTMLHelper
      * @param  object   $post       The post object.
      * @return array
      */
-    public static function createOpenGraphTagsForPost($post)
-    {
+    public static function createOpenGraphTagsForPost($post) {
        return [
             'og:title'               => $post->title,
             'og:type'                => 'article',
@@ -899,8 +886,7 @@ class HTMLHelper
      * @param  object   $post       The post object.
      * @return array
      */
-    public static function createTwitterTagsForPost($post)
-    {
+    public static function createTwitterTagsForPost($post) {
         return [
             'twitter:card'        => Config::get('lasallecmsfrontend.twitter_card'),
             'twitter:site'        => Config::get('lasallecmsfrontend.twitter_site'),
@@ -919,8 +905,7 @@ class HTMLHelper
      * @param  object   $post       The post object.
      * @return array
      */
-    public static function createGoogleTagsForPost($post)
-    {
+    public static function createGoogleTagsForPost($post) {
         return [
             'name'        => $post->title,
             'description' => $post->meta_description,
@@ -937,18 +922,22 @@ class HTMLHelper
     ///////////////////          MISC                  ////////////////
     ///////////////////////////////////////////////////////////////////
 
-    /*
+    /**
      * Make sure the URL is fully qualified
      *
      * @param   string  $url
      * @return  string
      */
-    public static function prefaceURLwithHTTP($url)
-    {
+    public static function prefaceURLwithHTTP($url) {
         $url = trim($url);
-        if (substr($url, 0, 7 ) == "http://") return $url;
 
-        if (substr($url, 0, 8 ) == "https://") return $url;
+        if (substr($url, 0, 7 ) == "http://") {
+            return $url;
+        }
+
+        if (substr($url, 0, 8 ) == "https://") {
+            return $url;
+        }
 
         return "http://".$url;
     }
@@ -959,11 +948,14 @@ class HTMLHelper
      * @param  text  $url
      * @return bool
      */
-    public static function isHTTPorHTTPS($url)
-    {
-        if (substr($url, 0, 7 ) == "http://") return true;
+    public static function isHTTPorHTTPS($url) {
+        if (substr($url, 0, 7 ) == "http://") {
+            return true;
+        }
 
-        if (substr($url, 0, 8 ) == "https://") return true;
+        if (substr($url, 0, 8 ) == "https://") {
+            return true;
+        }
 
         return false;
     }
