@@ -434,7 +434,7 @@ class ImagesHelper
      */
     public function pathOfImagesUploadFolder()
     {
-        return public_path() .'/'. Config::get('lasallecmsfrontend.images_folder_uploaded');
+        return $this->pathOfImagesUploadParentFolder() .'/'. Config::get('lasallecmsfrontend.images_folder_uploaded');
     }
 
     /**
@@ -444,7 +444,24 @@ class ImagesHelper
      */
     public function pathOfImagesResizedFolder()
     {
-        return public_path() .'/'. Config::get('lasallecmsfrontend.images_folder_resized');
+        return $this->pathOfImagesUploadParentFolder() .'/'. Config::get('lasallecmsfrontend.images_folder_resized');
+    }
+
+    /**
+     * Path of parent user upload folder
+     * @return string
+     */
+    public function pathOfImagesUploadParentFolder() {
+
+        if (Config::get('lasallecmsfrontend.images_parent_folder_uploaded') == "storage") {
+            return storage_path();
+        }
+
+        if (Config::get('lasallecmsfrontend.images_parent_folder_uploaded') == "public") {
+            return public_path();
+        }
+
+        return public_path();
     }
 
     /**
