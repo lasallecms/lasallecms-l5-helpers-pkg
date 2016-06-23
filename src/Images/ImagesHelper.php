@@ -454,13 +454,19 @@ class ImagesHelper
     public function pathOfImagesUploadParentFolder() {
 
         if (Config::get('lasallecmsfrontend.images_parent_folder_uploaded') == "storage") {
+
+            // If this is an ENVOYER.io deployment, then there's going to be environment
+            // variables for the server's path-to-storage. So, if it exists, use it!
+            // ENVOYER_PATH_STORAGE_ONLY
+            if (env('ENVOYER_PATH_STORAGE_ONLY')) {
+                return env('ENVOYER_PATH_STORAGE_ONLY');
+            }
+
+            // Locally, we are using the storage path for user uploads
             return storage_path();
         }
 
-        if (Config::get('lasallecmsfrontend.images_parent_folder_uploaded') == "public") {
-            return public_path();
-        }
-
+        // Still here? Return the public path.
         return public_path();
     }
 
