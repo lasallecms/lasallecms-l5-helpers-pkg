@@ -845,7 +845,13 @@ class HTMLHelper
      */
     public static function determineEpisodeImagePath($episode, $show) {
         if (empty($episode->featured_image)) {
-            return Config('app.url') .'/'. Config::get('lasallecastfrontend.images_shows') .'/'. $show->featured_image;
+
+            // I'm gonna be a very bad boy here and just return the cloudfront path,
+            // because, at this point, LaSalleCast is just for moi, and I use AWS cloudfront
+
+            return $show->featured_image;
+
+            //return Config('app.url') .'/'. Config::get('lasallecastfrontend.images_shows') .'/'. $show->featured_image;
         }
 
         return $show->image_file_storage_url . $episode->featured_image;
