@@ -739,7 +739,8 @@ class HTMLHelper
             'twitter:title'       => $show->title,
             'twitter:description' => $show->meta_description,
             'twitter:creator'     => Config::get('lasallecmsfrontend.twitter_creator'),
-            'twitter:image:src'   => Config('app.url') .'/'. Config::get('lasallecastfrontend.images_shows') .'/'. $show->featured_image,
+            //'twitter:image:src'   => Config('app.url') .'/'. Config::get('lasallecastfrontend.images_shows') .'/'. $show->featured_image,
+            'twitter:image'       => Config('app.url') .'/'. Config::get('lasallecastfrontend.images_shows') .'/'. $show->featured_image,
         ];
     }
 
@@ -816,7 +817,8 @@ class HTMLHelper
             'twitter:title'       => $episode->title,
             'twitter:description' => $episode->meta_description,
             'twitter:creator'     => Config::get('lasallecmsfrontend.twitter_creator'),
-            'twitter:image:src'   => self::determineEpisodeImagePath($episode, $show),
+            //'twitter:image:src'   => self::determineEpisodeImagePath($episode, $show),
+            'twitter:image'       => self::determineEpisodeImagePath($episode, $show),
         ];
     }
 
@@ -899,7 +901,8 @@ class HTMLHelper
             'twitter:title'       => $post->title,
             'twitter:description' => $post->meta_description,
             'twitter:creator'     => Config::get('lasallecmsfrontend.twitter_creator'),
-            'twitter:image:src'   => $post->urlImage,
+            //'twitter:image:src'   => $post->urlImage,
+            'twitter:image'       => $post->urlImage,
         ];
     }
 
