@@ -33,7 +33,6 @@ namespace Lasallecms\Helpers\Middleware;
 // Laravel classes
 use Closure;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Http\Request;
 
 
@@ -48,7 +47,7 @@ use Illuminate\Http\Request;
  * @param $next        The next closure.
  * @return redirect    Redirs to the secure counterpart of the requested uri.
  */
-class SecureURL implements Middleware
+class SecureURL
 {
     /**
      * Handle an incoming request.
