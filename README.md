@@ -12,7 +12,7 @@
 Helpers package made specifically for my LaSalle Content Management System. 
 
 
-[M*** DO NOT USE THIS REPOSITORY!! NOT MAINTAINED!! GO TO [LaSalleSoftware.ca](https://lasallesoftware.ca) ***
+*** DO NOT USE THIS REPOSITORY!! NOT MAINTAINED!! GO TO [LaSalleSoftware.ca](https://lasallesoftware.ca) ***
 
 
 ## Security
